@@ -41,12 +41,13 @@
          <div class="">
             <div class="">
                <h4 class="page-title"><?php echo "Welcome back ". $_SESSION['login_name']."!"  ?></h4>
-               <hr><div style="background: #121FCF; background: linear-gradient(to right, #121FCF 0%, #CF1512 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;">
+               <hr>
+               <!--div style="background: #121FCF; background: linear-gradient(to right, #121FCF 0%, #CF1512 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;">
 
 For any software development or website designing work contact me at     <a href="mailto:mayuri.infospace@gmail.com" >mayuri.infospace@gmail.com  </a>
 
  Visit website - www.mayurik.com</div>
-<hr>
+<hr-->
                <div class="row">
                   <div class="col-md-4 mb-3">
                      <div class="card card-1">

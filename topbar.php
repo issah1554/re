@@ -56,7 +56,7 @@ function googleTranslateElementInit() {
 }
 </script>
 
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<!--script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 
 <script type="text/javascript">
@@ -74,7 +74,7 @@ function googleTranslateElementInit() {
         }).remove();
 
     }
-</script>
+</script-->
 <style>
     .goog-te-gadget .goog-te-combo {
         margin: 0px 0;
