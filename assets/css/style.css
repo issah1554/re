@@ -1612,7 +1612,7 @@ a.nav-item:focus,.nav-item.active {
 main#view-panel{
   margin-left: 250px; 
   width:calc(100% - 250px);
-  margin-top: 3.5rem;
+  margin-top: 100px;
   padding: .5em
 }
 .toast{

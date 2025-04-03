@@ -16,9 +16,6 @@
          <a href="index.php" class="logo logo-admin"><img src="assets/img/logo.png" alt="logo" width="220"></a>
       </div>
       <div class="col-md-8 text-white d-flex justify-content-between">
-         <!-- <large class="text-center text-dark"><b><//?php echo isset($_SESSION['system']['name']) ? $_SESSION['system']['name'] : '' ?></b></large> -->
-          <b id="time" class="ml-lg-5 pl-lg-5 d-none d-md-block text-dark time"></b>
-          <div id="google_translate_element"></div>
       </div>
 
       <div class="col-md-2">
@@ -44,11 +41,6 @@
    })
 </script>
 
-
-<script language="javascript">
-    var today = new Date();
-    document.getElementById('time').innerHTML = today;
-</script>
 
 <script type="text/javascript">
 function googleTranslateElementInit() {
