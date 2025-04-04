@@ -20,62 +20,39 @@ class Action
 		ob_end_flush();
 	}
 
-	function login()
-	{
-
+	function login() {
 		extract($_POST);
-		$qry = $this->db->query("SELECT * FROM users where username = '" . $username . "' and password = '" . md5($password) . "' ");
-		if ($qry->num_rows > 0) {
-			foreach ($qry->fetch_array() as $key => $value) {
-				if ($key != 'passwors' && !is_numeric($key))
-					$_SESSION['login_' . $key] = $value;
-			}
-			if ($_SESSION['login_type'] != 1) {
-				foreach ($_SESSION as $key => $value) {
-					unset($_SESSION[$key]);
-				}
-				return 2;
-				exit;
-			}
-			return 1;
-		} else {
-			return 3;
+		
+		// Check if username and password are provided
+		if(empty($username) || empty($password)) {
+			return 0; // Invalid input
 		}
-	}
-
-	function login2()
-	{
-
-		extract($_POST);
-		if (isset($email))
-			$username = $email;
-		$qry = $this->db->query("SELECT * FROM users where username = '" . $username . "' and password = '" . md5($password) . "' ");
-		if ($qry->num_rows > 0) {
-			foreach ($qry->fetch_array() as $key => $value) {
-				if ($key != 'passwors' && !is_numeric($key))
-					$_SESSION['login_' . $key] = $value;
+	
+		// Prepare and execute query
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
+		$stmt->bind_param("s", $username);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		
+		if($result->num_rows > 0) {
+			$user = $result->fetch_assoc();
+			
+			// Verify password (assuming passwords are hashed)
+			if(password_verify($password, $user['password'])) {
+				// Set session variables
+				$_SESSION['login_id'] = $user['id'];
+				$_SESSION['login_type'] = $user['type'];
+				$_SESSION['login_name'] = $user['name'];
+				$_SESSION['login_firstname'] = $user['first_name'];
+				$_SESSION['login_lastname'] = $user['last_name'];
+								
+				return 1; // Successful login
 			}
-			if ($_SESSION['login_alumnus_id'] > 0) {
-				$bio = $this->db->query("SELECT * FROM alumnus_bio where id = " . $_SESSION['login_alumnus_id']);
-				if ($bio->num_rows > 0) {
-					foreach ($bio->fetch_array() as $key => $value) {
-						if ($key != 'passwors' && !is_numeric($key))
-							$_SESSION['bio'][$key] = $value;
-					}
-				}
-			}
-			if ($_SESSION['bio']['status'] != 1) {
-				foreach ($_SESSION as $key => $value) {
-					unset($_SESSION[$key]);
-				}
-				return 2;
-				exit;
-			}
-			return 1;
-		} else {
-			return 3;
 		}
+		
+		return 2; // Invalid credentials
 	}
+	
 	function logout()
 	{
 		session_destroy();
@@ -244,7 +221,7 @@ class Action
 			if ($data) {
 				$aid = $this->db->insert_id;
 				$this->db->query("UPDATE users set alumnus_id = $aid where id = $uid ");
-				$login = $this->login2();
+				// $login = $this->login2();
 				if ($login)
 					return 1;
 			}
@@ -283,7 +260,7 @@ class Action
 				foreach ($_SESSION as $key => $value) {
 					unset($_SESSION[$key]);
 				}
-				$login = $this->login2();
+				// $login = $this->login2();
 				if ($login)
 					return 1;
 			}

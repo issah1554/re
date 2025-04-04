@@ -6,9 +6,9 @@ include 'db_connect.php';
 	<div class="row">
 		<div class="col-lg-12">
 			<div class="card">
-				<div class="card-header bg-primary text-white">
+				<div class="card-header">
 					<b>List of Users</b>
-					<button class="btn btn-light btn-sm col-sm-2 float-right" data-toggle="modal" data-target="#userModal" id="new_user">
+					<button class="btn btn-primary btn-sm col-sm-2 float-right" data-toggle="modal" data-target="#userModal" id="new_user">
 						<i class="fa fa-plus"></i> New User
 					</button>
 				</div>
@@ -16,11 +16,11 @@ include 'db_connect.php';
 					<table class="table table-striped table-bordered" id="users-table">
 						<thead>
 							<tr>
-								<th class="text-center">#</th>
-								<th class="text-center">Full Name</th>
-								<th class="text-center">Username</th>
-								<th class="text-center">Role</th>
-								<th class="text-center">Action</th>
+								<th >#</th>
+								<th >Full Name</th>
+								<th >Username</th>
+								<th >Role</th>
+								<th >Action</th>
 							</tr>
 						</thead>
 						<tbody>
