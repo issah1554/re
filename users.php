@@ -95,8 +95,9 @@ include 'db_connect.php';
 						<label for="type">User Type</label>
 						<select name="type" id="type" class="form-control" required>
 							<option value="1">Admin</option>
-							<option value="2">Staff</option>
-							<option value="3">Alumnus/Alumna</option>
+							<option value="2">Owner</option>
+							<option value="3">Manager</option>
+							<option value="4">Tenant</option>
 						</select>
 					</div>
 				</form>
@@ -187,7 +188,7 @@ include 'db_connect.php';
 				}
 			});
 		});
-		
+
 		// Delete user
 		$(document).on('click', '.delete_user', function() {
 			var id = $(this).data('id');

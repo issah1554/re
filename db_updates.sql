@@ -1,3 +1,2 @@
-ALTER TABLE users
-ADD COLUMN first_name VARCHAR(100) NOT NULL,
-ADD COLUMN last_name VARCHAR(100) NOT NULL,
+ALTER TABLE users 
+MODIFY `type` TINYINT(1) NOT NULL DEFAULT 4 COMMENT '1 = Admin, 2 = Owner, 3 = Manager, 4 = Tenant';
