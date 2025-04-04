@@ -93,69 +93,125 @@ class Action
 		header("location:../index.php");
 	}
 
-	function save_user()
+
+
+	// ADMIN USER MANAGEMENT
+	//--------------------------------------------------
+	function create_user()
 	{
-		$name = $_POST['name'] ?? '';
-		$username = $_POST['username'] ?? '';
-		$password = $_POST['password'] ?? '';
-		$type = $_POST['type'] ?? '';
-		$id = $_POST['id'] ?? null;
-		$establishment_id = $_POST['establishment_id'] ?? 0;
+		extract($_POST);
 
-		if ($type == 1) {
-			$establishment_id = 0;
+		// Validate input
+		if (empty($username) || empty($password) || empty($first_name) || empty($last_name)) {
+			return json_encode(['status' => 'error', 'message' => 'All fields are required']);
 		}
 
-		// Check for duplicate username
-		$stmt = $this->db->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
-		$stmt->bind_param("si", $username, $id);
-		$stmt->execute();
-		$stmt->store_result();
-
-		if ($stmt->num_rows > 0) {
-			$stmt->close();
-			return 2; // Username already exists
+		// Check if username already exists
+		$check = $this->db->query("SELECT * FROM users WHERE username = '$username'");
+		if ($check->num_rows > 0) {
+			return json_encode(['status' => 'error', 'message' => 'Username already exists']);
 		}
-		$stmt->close();
 
-		// Hash password if provided
-		if (!empty($password)) {
-			$password = password_hash($password, PASSWORD_DEFAULT);
+		// Hash password
+		$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+		// Insert new user
+		$sql = "INSERT INTO users (username, password, type, first_name, last_name) 
+                VALUES ('$username', '$hashed_password', '$type', '$first_name', '$last_name')";
+
+		if ($this->db->query($sql)) {
+			return json_encode(['status' => 'success', 'message' => 'User created successfully']);
 		} else {
-			$password = null;
+			return json_encode(['status' => 'error', 'message' => 'Error creating user: ' . $this->db->error]);
 		}
+	}
 
-		if (empty($id)) {
-			// Insert new user
-			$stmt = $this->db->prepare("INSERT INTO users (name, username, password, type, establishment_id) VALUES (?, ?, ?, ?, ?)");
-			$stmt->bind_param("sssii", $name, $username, $password, $type, $establishment_id);
+	function get_user_id()
+	{
+		$id = $_GET['id'];
+		$sql = "SELECT * FROM users WHERE id = '$id'";
+		$result = $this->db->query($sql);
+
+		if ($result->num_rows > 0) {
+			$row = $result->fetch_assoc();
+			// Don't return password for security
+			unset($row['password']);
+			return json_encode($row);
 		} else {
-			// Update existing user
-			if (!empty($password)) {
-				$stmt = $this->db->prepare("UPDATE users SET name=?, username=?, password=?, type=?, establishment_id=? WHERE id=?");
-				$stmt->bind_param("sssiii", $name, $username, $password, $type, $establishment_id, $id);
-			} else {
-				$stmt = $this->db->prepare("UPDATE users SET name=?, username=?, type=?, establishment_id=? WHERE id=?");
-				$stmt->bind_param("ssiii", $name, $username, $type, $establishment_id, $id);
-			}
+			return json_encode(['status' => 'error', 'message' => 'User not found']);
 		}
+	}
 
-		if ($stmt->execute()) {
-			$stmt->close();
-			return 1; // Success
+	function update_user()
+	{
+		// Get all POST data
+		$post_data = $_POST;
+		
+		// Validate required fields
+		if(empty($post_data['username']) || empty($post_data['first_name']) || empty($post_data['last_name'])) {
+			return json_encode(['status' => 'error', 'message' => 'Username, First Name and Last Name are required']);
+		}
+	
+		// Get and sanitize user_id
+		$id = isset($post_data['user_id']) ? $this->db->real_escape_string($post_data['user_id']) : null;
+		if(empty($id)) {
+			return json_encode(['status' => 'error', 'message' => 'User ID is required']);
+		}
+	
+		// Sanitize other inputs
+		$username = $this->db->real_escape_string($post_data['username']);
+		$type = $this->db->real_escape_string($post_data['type']);
+		$first_name = $this->db->real_escape_string($post_data['first_name']);
+		$last_name = $this->db->real_escape_string($post_data['last_name']);
+	
+		// Check if username exists for another user
+		$check = $this->db->query("SELECT * FROM users WHERE username = '$username' AND id != '$id'");
+		if($check->num_rows > 0) {
+			return json_encode(['status' => 'error', 'message' => 'Username already exists for another user']);
+		}
+	
+		// Prepare update query
+		$update_fields = [
+			"username = '$username'",
+			"type = '$type'",
+			"first_name = '$first_name'",
+			"last_name = '$last_name'"
+		];
+	
+		// Update password only if provided
+		if(!empty($post_data['password'])) {
+			$hashed_password = password_hash($post_data['password'], PASSWORD_DEFAULT);
+			$update_fields[] = "password = '$hashed_password'";
+		}
+	
+		$sql = "UPDATE users SET " . implode(', ', $update_fields) . " WHERE id = '$id'";
+	
+		if($this->db->query($sql)) {
+			return json_encode(['status' => 'success', 'message' => 'User updated successfully']);
 		} else {
-			$stmt->close();
-			return 0; // Failure
+			return json_encode(['status' => 'error', 'message' => 'Error updating user: ' . $this->db->error]);
 		}
 	}
 	
 	function delete_user()
 	{
-		extract($_POST);
-		$delete = $this->db->query("DELETE FROM users where id = " . $id);
-		if ($delete)
-			return 1;
+		$id = $_POST['id'];
+
+		// Prevent deleting yourself
+		if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $id) {
+			return json_encode(['status' => 'error', 'message' => 'You cannot delete your own account']);
+		}
+
+		$sql = "DELETE FROM users WHERE id = '$id'";
+
+		if ($this->db->query($sql)) {
+			return json_encode(['status' => 'success', 'message' => 'User deleted successfully']);
+		} else {
+			return json_encode(['status' => 'error', 'message' => 'Error deleting user: ' . $this->db->error]);
+		}
 	}
+
+
 	function signup()
 	{
 		extract($_POST);

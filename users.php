@@ -1,6 +1,7 @@
 <?php
 include 'db_connect.php';
 ?>
+
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-lg-12">
@@ -16,7 +17,7 @@ include 'db_connect.php';
 						<thead>
 							<tr>
 								<th class="text-center">#</th>
-								<th class="text-center">Name</th>
+								<th class="text-center">Full Name</th>
 								<th class="text-center">Username</th>
 								<th class="text-center">Role</th>
 								<th class="text-center">Action</th>
@@ -31,7 +32,7 @@ include 'db_connect.php';
 							?>
 								<tr>
 									<td class="text-center"><?php echo $i++ ?></td>
-									<td><?php echo ucwords($row['name']) ?></td>
+									<td><?php echo ucwords($row['first_name']) . " " . ucwords($row['last_name']) ?></td>
 									<td><?php echo $row['username'] ?></td>
 									<td><?php echo $type[$row['type']] ?></td>
 									<td class="text-center">
@@ -69,13 +70,18 @@ include 'db_connect.php';
 			<div class="modal-body">
 				<div id="msg"></div>
 				<form action="" id="manage-user">
-					
+
 					<input type="hidden" name="id" id="user_id">
 
 					<div class="form-group">
-						<label for="name">Full Name</label>
-						<input type="text" name="name" id="name" class="form-control" required>
+						<label for="name">First Name</label>
+						<input type="text" name="first_name" id="first_name" class="form-control" required>
 					</div>
+					<div class="form-group">
+						<label for="name">Last Name</label>
+						<input type="text" name="last_name" id="last_name" class="form-control" required>
+					</div>
+
 					<div class="form-group">
 						<label for="username">Username</label>
 						<input type="text" name="username" id="username" class="form-control" required autocomplete="off">
@@ -114,66 +120,94 @@ include 'db_connect.php';
 			$('#manage-user')[0].reset();
 			$('#user_id').val('');
 			$('#msg').html('');
+			$('#password').prop('required', true); // Make password required for new users
+			$('#userModal').modal('show');
 		});
 
 		// Edit user button
-		$('.edit_user').click(function() {
+		$(document).on('click', '.edit_user', function() {
 			var id = $(this).data('id');
 			$.ajax({
-				url: 'get_user.php?id=' + id,
+				url: 'ajax.php?action=get_user_id&id=' + id,
 				method: 'GET',
+				dataType: 'json',
 				success: function(resp) {
-					if (resp) {
-						resp = JSON.parse(resp);
+					if (resp && !resp.status) { // Check if not an error response
 						$('#userModalLabel').text('Edit User');
 						$('#user_id').val(resp.id);
-						$('#name').val(resp.name);
 						$('#username').val(resp.username);
 						$('#type').val(resp.type);
+						$('#first_name').val(resp.first_name);
+						$('#last_name').val(resp.last_name);
+						$('#password').prop('required', false); // Password not required for update
 						$('#userModal').modal('show');
+						console.log("User data:", resp); // <-- log user data
+					} else if (resp && resp.status === 'error') {
+						alert(resp.message);
 					}
+				},
+				error: function(xhr, status, error) {
+					alert('Error fetching user data: ' + error);
 				}
 			});
 		});
 
-		// Form submission
-		$('#manage-user').submit(function(e) {
-			e.preventDefault();
-			var formData = $(this).serialize();
-			var id = $('#user_id').val();
-			var url = id ? 'update_user.php' : 'create_user.php';
+// Form submission
+$('#manage-user').submit(function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    var id = $('#user_id').val();
+    var url = id ? 'ajax.php?action=update_user' : 'ajax.php?action=create_user';
 
-			$.ajax({
-				url: url,
-				method: 'POST',
-				data: formData,
-				success: function(resp) {
-					resp = JSON.parse(resp);
-					if (resp.status == 'success') {
-						$('#msg').html('<div class="alert alert-success">' + resp.message + '</div>');
-						setTimeout(function() {
-							$('#userModal').modal('hide');
-							location.reload();
-						}, 2000);
-					} else {
-						$('#msg').html('<div class="alert alert-danger">' + resp.message + '</div>');
-					}
-				}
-			});
-		});
+    // Add user_id to formData if it exists
+    if(id) {
+        formData += '&user_id=' + id;
+    }
 
+    $('#msg').html('<div class="alert alert-info">Processing...</div>');
+    
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.status == 'success') {
+                $('#msg').html('<div class="alert alert-success">' + resp.message + '</div>');
+                setTimeout(function() {
+                    $('#userModal').modal('hide');
+                    location.reload();
+                }, 1500);
+            } else {
+                $('#msg').html('<div class="alert alert-danger">' + resp.message + '</div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#msg').html('<div class="alert alert-danger">Error: ' + error + '</div>');
+        }
+    });
+});
 		// Delete user
-		$('.delete_user').click(function() {
+		$(document).on('click', '.delete_user', function() {
 			var id = $(this).data('id');
-			if (confirm('Are you sure you want to delete this user?')) {
+			if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
 				$.ajax({
-					url: 'delete_user.php',
+					url: 'ajax.php?action=delete_user',
 					method: 'POST',
 					data: {
 						id: id
 					},
+					dataType: 'json',
 					success: function(resp) {
-						location.reload();
+						if (resp.status == 'success') {
+							alert(resp.message);
+							location.reload();
+						} else {
+							alert(resp.message);
+						}
+					},
+					error: function(xhr, status, error) {
+						alert('Error: ' + error);
 					}
 				});
 			}
