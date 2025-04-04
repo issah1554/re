@@ -1,53 +1,58 @@
 <?php include 'db_connect.php' ?>
 <style>
    span.float-right.summary_icon {
-   font-size: 3rem;
-   position: absolute;
-   right: 1rem;
-   top: 0;
+      font-size: 3rem;
+      position: absolute;
+      right: 1rem;
+      top: 0;
    }
-   .imgs{
-   margin: .5em;
-   max-width: calc(100%);
-   max-height: calc(100%);
+
+   .imgs {
+      margin: .5em;
+      max-width: calc(100%);
+      max-height: calc(100%);
    }
-   .imgs img{
-   max-width: calc(100%);
-   max-height: calc(100%);
-   cursor: pointer;
+
+   .imgs img {
+      max-width: calc(100%);
+      max-height: calc(100%);
+      cursor: pointer;
    }
-   #imagesCarousel,#imagesCarousel .carousel-inner,#imagesCarousel .carousel-item{
-   height: 60vh !important;background: black;
+
+   #imagesCarousel,
+   #imagesCarousel .carousel-inner,
+   #imagesCarousel .carousel-item {
+      height: 60vh !important;
+      background: black;
    }
-   #imagesCarousel .carousel-item.active{
-   display: flex !important;
+
+   #imagesCarousel .carousel-item.active {
+      display: flex !important;
    }
-   #imagesCarousel .carousel-item-next{
-   display: flex !important;
+
+   #imagesCarousel .carousel-item-next {
+      display: flex !important;
    }
-   #imagesCarousel .carousel-item img{
-   margin: auto;
+
+   #imagesCarousel .carousel-item img {
+      margin: auto;
    }
-   #imagesCarousel img{
-   width: auto!important;
-   height: auto!important;
-   max-height: calc(100%)!important;
-   max-width: calc(100%)!important;
+
+   #imagesCarousel img {
+      width: auto !important;
+      height: auto !important;
+      max-height: calc(100%) !important;
+      max-width: calc(100%) !important;
    }
 </style>
+
 <div class="containe-fluid">
    <div class="row mt-3 ml-3 mr-3">
       <div class="col-lg-12">
          <div class="">
             <div class="">
-               <h4 class="page-title"><?php echo "Welcome back ". $_SESSION['login_name']."!"  ?></h4>
+               <h4 class="page-title"><?php echo "Welcome back " . $_SESSION['login_name'] . "!"  ?></h4>
                <hr>
-               <!--div style="background: #121FCF; background: linear-gradient(to right, #121FCF 0%, #CF1512 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;">
-
-For any software development or website designing work contact me at     <a href="mailto:mayuri.infospace@gmail.com" >mayuri.infospace@gmail.com  </a>
-
- Visit website - www.mayurik.com</div>
-<hr-->
                <div class="row">
                   <div class="col-md-4 mb-3">
                      <div class="card card-1">
@@ -122,10 +127,10 @@ For any software development or website designing work contact me at     <a href
                                  <div class="col-9 align-self-center text-right">
                                     <div class="m-l-10">
                                        <h3 class="text1">
-                                          <?php 
-                                             $payment = $conn->query("SELECT sum(amount) as paid FROM payments where date(date_created) = '".date('Y-m-d')."' "); 
-                                             echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'],2) : 0;
-                                             ?>
+                                          <?php
+                                          $payment = $conn->query("SELECT sum(amount) as paid FROM payments where date(date_created) = '" . date('Y-m-d') . "' ");
+                                          echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'], 2) : 0;
+                                          ?>
                                        </h3>
                                        <p>Payments This Month</p>
                                     </div>
@@ -250,76 +255,81 @@ For any software development or website designing work contact me at     <a href
    feather.replace();
 </script>
 <script>
-   $('#manage-records').submit(function(e){
-          e.preventDefault()
-          start_load()
-          $.ajax({
-              url:'ajax.php?action=save_track',
-              data: new FormData($(this)[0]),
-              cache: false,
-              contentType: false,
-              processData: false,
-              method: 'POST',
-              type: 'POST',
-              success:function(resp){
-                  resp=JSON.parse(resp)
-                  if(resp.status==1){
-                      alert_toast("Data successfully saved",'success')
-                      setTimeout(function(){
-                          location.reload()
-                      },800)
-   
-                  }
-                  
-              }
-          })
+   $('#manage-records').submit(function(e) {
+      e.preventDefault()
+      start_load()
+      $.ajax({
+         url: 'ajax.php?action=save_track',
+         data: new FormData($(this)[0]),
+         cache: false,
+         contentType: false,
+         processData: false,
+         method: 'POST',
+         type: 'POST',
+         success: function(resp) {
+            resp = JSON.parse(resp)
+            if (resp.status == 1) {
+               alert_toast("Data successfully saved", 'success')
+               setTimeout(function() {
+                  location.reload()
+               }, 800)
+
+            }
+
+         }
       })
-      $('#tracking_id').on('keypress',function(e){
-          if(e.which == 13){
-              get_person()
-          }
-      })
-      $('#check').on('click',function(e){
-              get_person()
-      })
-      function get_person(){
-              start_load()
-          $.ajax({
-                  url:'ajax.php?action=get_pdetails',
-                  method:"POST",
-                  data:{tracking_id : $('#tracking_id').val()},
-                  success:function(resp){
-                      if(resp){
-                          resp = JSON.parse(resp)
-                          if(resp.status == 1){
-                              $('#name').html(resp.name)
-                              $('#address').html(resp.address)
-                              $('[name="person_id"]').val(resp.id)
-                              $('#details').show()
-                              end_load()
-   
-                          }else if(resp.status == 2){
-                              alert_toast("Unknow tracking id.",'danger');
-                              end_load();
-                          }
-                      }
-                  }
-              })
+   })
+   $('#tracking_id').on('keypress', function(e) {
+      if (e.which == 13) {
+         get_person()
       }
+   })
+   $('#check').on('click', function(e) {
+      get_person()
+   })
+
+   function get_person() {
+      start_load()
+      $.ajax({
+         url: 'ajax.php?action=get_pdetails',
+         method: "POST",
+         data: {
+            tracking_id: $('#tracking_id').val()
+         },
+         success: function(resp) {
+            if (resp) {
+               resp = JSON.parse(resp)
+               if (resp.status == 1) {
+                  $('#name').html(resp.name)
+                  $('#address').html(resp.address)
+                  $('[name="person_id"]').val(resp.id)
+                  $('#details').show()
+                  end_load()
+
+               } else if (resp.status == 2) {
+                  alert_toast("Unknow tracking id.", 'danger');
+                  end_load();
+               }
+            }
+         }
+      })
+   }
 </script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-   google.charts.load('current', {'packages':['corechart']});
+   google.charts.load('current', {
+      'packages': ['corechart']
+   });
    google.charts.setOnLoadCallback(drawChart);
 
    function drawChart() {
       var data = google.visualization.arrayToDataTable([
          ['Types', 'Booking'],
-         ['Single-Family Home',     11],
-         ['Townhouse',      2],
-         ['Condominium',  2],
+         ['Single-Family Home', 11],
+         ['Townhouse', 2],
+         ['Condominium', 2],
          ['Duplex', 2],
-         ['Tiny House',    7]
+         ['Tiny House', 7]
       ]);
 
       var options = {
@@ -347,7 +357,8 @@ For any software development or website designing work contact me at     <a href
          chart.draw(data, options);
       }
    }
-</script><footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
+</script>
+<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
    <p class="text-muted mb-1 mb-md-0">Copyright © 2024 <a href="https://www.mayurik.com" target="_blank">Tenant Management System Software</a> - Design By Mayuri K. Freelancer</p>
-   
+
 </footer>

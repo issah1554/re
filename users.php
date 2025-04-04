@@ -16,16 +16,16 @@ include 'db_connect.php';
 					<table class="table table-striped table-bordered" id="users-table">
 						<thead>
 							<tr>
-								<th >#</th>
-								<th >Full Name</th>
-								<th >Username</th>
-								<th >Role</th>
-								<th >Action</th>
+								<th>#</th>
+								<th>Full Name</th>
+								<th>Username</th>
+								<th>Role</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php
-							$type = array("", "Admin", "Staff", "Alumnus/Alumna");
+							$role = array("", "Admin", "Owner", "Manager", "Ternant");
 							$users = $conn->query("SELECT * FROM users ORDER BY name ASC");
 							$i = 1;
 							while ($row = $users->fetch_assoc()):
@@ -34,7 +34,7 @@ include 'db_connect.php';
 									<td class="text-center"><?php echo $i++ ?></td>
 									<td><?php echo ucwords($row['first_name']) . " " . ucwords($row['last_name']) ?></td>
 									<td><?php echo $row['username'] ?></td>
-									<td><?php echo $type[$row['type']] ?></td>
+									<td><?php echo $role[$row['type']] ?></td>
 									<td class="text-center">
 										<div class="btn-group">
 											<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -152,41 +152,42 @@ include 'db_connect.php';
 			});
 		});
 
-// Form submission
-$('#manage-user').submit(function(e) {
-    e.preventDefault();
-    var formData = $(this).serialize();
-    var id = $('#user_id').val();
-    var url = id ? 'ajax.php?action=update_user' : 'ajax.php?action=create_user';
+		// Form submission
+		$('#manage-user').submit(function(e) {
+			e.preventDefault();
+			var formData = $(this).serialize();
+			var id = $('#user_id').val();
+			var url = id ? 'ajax.php?action=update_user' : 'ajax.php?action=create_user';
 
-    // Add user_id to formData if it exists
-    if(id) {
-        formData += '&user_id=' + id;
-    }
+			// Add user_id to formData if it exists
+			if (id) {
+				formData += '&user_id=' + id;
+			}
 
-    $('#msg').html('<div class="alert alert-info">Processing...</div>');
-    
-    $.ajax({
-        url: url,
-        method: 'POST',
-        data: formData,
-        dataType: 'json',
-        success: function(resp) {
-            if (resp.status == 'success') {
-                $('#msg').html('<div class="alert alert-success">' + resp.message + '</div>');
-                setTimeout(function() {
-                    $('#userModal').modal('hide');
-                    location.reload();
-                }, 1500);
-            } else {
-                $('#msg').html('<div class="alert alert-danger">' + resp.message + '</div>');
-            }
-        },
-        error: function(xhr, status, error) {
-            $('#msg').html('<div class="alert alert-danger">Error: ' + error + '</div>');
-        }
-    });
-});
+			$('#msg').html('<div class="alert alert-info">Processing...</div>');
+
+			$.ajax({
+				url: url,
+				method: 'POST',
+				data: formData,
+				dataType: 'json',
+				success: function(resp) {
+					if (resp.status == 'success') {
+						$('#msg').html('<div class="alert alert-success">' + resp.message + '</div>');
+						setTimeout(function() {
+							$('#userModal').modal('hide');
+							location.reload();
+						}, 1500);
+					} else {
+						$('#msg').html('<div class="alert alert-danger">' + resp.message + '</div>');
+					}
+				},
+				error: function(xhr, status, error) {
+					$('#msg').html('<div class="alert alert-danger">Error: ' + error + '</div>');
+				}
+			});
+		});
+		
 		// Delete user
 		$(document).on('click', '.delete_user', function() {
 			var id = $(this).data('id');
