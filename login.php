@@ -30,6 +30,7 @@ ob_end_flush();
 	?>
 
 </head>
+
 <style>
 	.field-icon {
 		position: absolute;
@@ -164,7 +165,7 @@ ob_end_flush();
 			},
 			success: function(resp) {
 				if (resp == 1) {
-					location.href = 'index.php?page=home';
+					location.href = 'index.php?page=home&role=1';
 				} else {
 					$('#login-form').prepend('<div class="alert alert-danger">Username or password is incorrect.</div>')
 					$('#login-form button[type="button"]').removeAttr('disabled').html('Login');

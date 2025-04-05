@@ -357,6 +357,7 @@ class Action
 			return 1;
 		}
 	}
+	
 	function save_house()
 	{
 		extract($_POST);
