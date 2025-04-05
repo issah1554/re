@@ -4,27 +4,28 @@ START TRANSACTION;
 -- If any error occurs, the transaction can be rolled back
 
 -- 2. Add the columns (without NOT NULL initially)
--- ALTER TABLE categories
--- ADD COLUMN created_by INT,
--- ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE categories
+ADD COLUMN created_by INT,
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 -- 5. Add the foreign key for categories
--- ALTER TABLE categories
--- ADD CONSTRAINT fk_categories_created_by 
--- FOREIGN KEY (created_by) REFERENCES users(id);
+ALTER TABLE categories
+ADD CONSTRAINT fk_categories_created_by 
+FOREIGN KEY (created_by) REFERENCES users(id);
 
 -- Add columns to the users table
---   ALTER TABLE users
---  ADD COLUMN phone VARCHAR(20) NOT NULL,
--- ADD COLUMN gender ENUM('male', 'female'),
--- ADD COLUMN last_login DATETIME,
--- ADD COLUMN created_by INT,
--- ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users
+ADD COLUMN phone VARCHAR(20) NOT NULL,
+add COLUMN avatar VARCHAR(255),
+ADD COLUMN gender ENUM('male', 'female'),
+ADD COLUMN last_login DATETIME,
+ADD COLUMN created_by INT,
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 -- 3. Add the foreign key constraint to the users table
--- ALTER TABLE users
--- ADD CONSTRAINT fk_users_created_by
--- FOREIGN KEY (created_by) REFERENCES users(id);
+ALTER TABLE users
+ADD CONSTRAINT fk_users_created_by
+FOREIGN KEY (created_by) REFERENCES users(id);
 
 -- Apartment table
 CREATE TABLE apartments (
@@ -72,7 +73,7 @@ add COLUMN verified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIM
 add COLUMN status ENUM('pending', 'completed', 'failed') DEFAULT 'pending';
 
 -- Add foreign keys to the payments table
-/* ALTER TABLE payments
+ALTER TABLE payments
 ADD CONSTRAINT fk_payments_apartment_id
 FOREIGN KEY (apartment_id) REFERENCES apartments(id);
 
@@ -82,6 +83,6 @@ FOREIGN KEY (created_by) REFERENCES users(id);
 
 ALTER TABLE payments
 ADD CONSTRAINT fk_payments_verified_by
-FOREIGN KEY (verified_by) REFERENCES users(id); */
+FOREIGN KEY (verified_by) REFERENCES users(id); 
 
 COMMIT;

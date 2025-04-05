@@ -1,364 +1,141 @@
-<?php include 'db_connect.php' ?>
-<style>
-    span.float-right.summary_icon {
-        font-size: 3rem;
-        position: absolute;
-        right: 1rem;
-        top: 0;
-    }
+<?php include('db_connect.php'); ?>
 
-    .imgs {
-        margin: .5em;
-        max-width: calc(100%);
-        max-height: calc(100%);
-    }
+<div class="container-fluid">
 
-    .imgs img {
-        max-width: calc(100%);
-        max-height: calc(100%);
-        cursor: pointer;
-    }
+    <div class="col-lg-12">
+        <div class="row mb-4 mt-4">
+            <div class="col-md-12">
 
-    #imagesCarousel,
-    #imagesCarousel .carousel-inner,
-    #imagesCarousel .carousel-item {
-        height: 60vh !important;
-        background: black;
-    }
+            </div>
+        </div>
+        <div class="row">
+            <!-- FORM Panel -->
 
-    #imagesCarousel .carousel-item.active {
-        display: flex !important;
-    }
-
-    #imagesCarousel .carousel-item-next {
-        display: flex !important;
-    }
-
-    #imagesCarousel .carousel-item img {
-        margin: auto;
-    }
-
-    #imagesCarousel img {
-        width: auto !important;
-        height: auto !important;
-        max-height: calc(100%) !important;
-        max-width: calc(100%) !important;
-    }
-</style>
-
-<div class="containe-fluid">
-    <div class="row mt-3 ml-3 mr-3">
-        <div class="col-lg-12">
-            <div class="">
-                <div class="">
-                    <h4 class="page-title"><?php echo "Welcome back " . $_SESSION['login_name'] . "!"  ?></h4>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-primary p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-home "></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM houses")->num_rows ?>
-                                                    </h3>
-                                                    <p>Total Houses</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=houses" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-warning p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-user-friends "></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                                    </h3>
-                                                    <p>Total Tenants</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-success p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-file-invoice "></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php
-                                                        $payment = $conn->query("SELECT sum(amount) as paid FROM payments where date(date_created) = '" . date('Y-m-d') . "' ");
-                                                        echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'], 2) : 0;
-                                                        ?>
-                                                    </h3>
-                                                    <p>Payments This Month</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=invoices" class="text-primary float-right">View Payments <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-danger p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-list"></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                                    </h3>
-                                                    <p>Total Reports</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-info p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-home"></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                                    </h3>
-                                                    <p>Total House Type</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card card-1">
-                                <div class="card-body card-1 bg-secondary p-0">
-                                    <div class="card-body text-white py-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="col-3 align-self-center">
-                                                <div class="round">
-                                                    <span class="float-right summary_icon"> <i class="fa fa-users"></i></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-9 align-self-center text-right">
-                                                <div class="m-l-10">
-                                                    <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                                    </h3>
-                                                    <p>Total Users</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                            </div>
-                        </div>
+            <!-- Table Panel -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <b>List of Tenant</b>
+                        <span class="float:right"><a class="btn btn-primary btn-block btn-sm col-sm-2 float-right" href="javascript:void(0)" id="new_tenant">
+                                <i class="fa fa-plus"></i> New Tenant
+                            </a>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-condensed table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="">Name</th>
+                                    <th class="">House Rented</th>
+                                    <th class="">Monthly Rate</th>
+                                    <th class="">Outstanding Balance</th>
+                                    <th class="">Last Payment</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $i = 1;
+                                $tenant = $conn->query("SELECT t.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id where t.status = 1 order by h.house_no desc ");
+                                while ($row = $tenant->fetch_assoc()):
+                                    $months = abs(strtotime(date('Y-m-d') . " 23:59:59") - strtotime($row['date_in'] . " 23:59:59"));
+                                    $months = floor(($months) / (30 * 60 * 60 * 24));
+                                    $payable = $row['price'] * $months;
+                                    $paid = $conn->query("SELECT SUM(amount) as paid FROM payments where tenant_id =" . $row['id']);
+                                    $last_payment = $conn->query("SELECT * FROM payments where tenant_id =" . $row['id'] . " order by unix_timestamp(date_created) desc limit 1");
+                                    $paid = $paid->num_rows > 0 ? $paid->fetch_array()['paid'] : 0;
+                                    $last_payment = $last_payment->num_rows > 0 ? date("M d, Y", strtotime($last_payment->fetch_array()['date_created'])) : 'N/A';
+                                    $outstanding = $payable - $paid;
+                                ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo $i++ ?></td>
+                                        <td>
+                                            <?php echo ucwords($row['name']) ?>
+                                        </td>
+                                        <td class="">
+                                            <p> <b><?php echo $row['house_no'] ?></b></p>
+                                        </td>
+                                        <td class="">
+                                            <p> <b><?php echo number_format($row['price'], 2) ?></b></p>
+                                        </td>
+                                        <td class="text-right">
+                                            <p> <b><?php echo number_format($outstanding, 2) ?></b></p>
+                                        </td>
+                                        <td class="">
+                                            <p><b><?php echo  $last_payment ?></b></p>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>">View</button>
+                                            <button class="btn btn-sm btn-primary edit_tenant" type="button" data-id="<?php echo $row['id'] ?>">Edit</button>
+                                            <button class="btn btn-sm btn-danger delete_tenant" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+            <!-- Table Panel -->
         </div>
     </div>
+
 </div>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 mb-3">
-            <div id="piechart" style="width: 100%; height: 500px;"></div>
-        </div>
-    </div>
-</div>
-<script src="https://unpkg.com/feather-icons@4.29.1/dist/feather.min.js"></script>
+
+<style>
+    td {
+        vertical-align: middle !important;
+    }
+
+    td p {
+        margin: unset
+    }
+
+    img {
+        max-width: 100px;
+        max-height: 150px;
+    }
+</style>
 <script>
-    feather.replace();
-</script>
-<script>
-    $('#manage-records').submit(function(e) {
-        e.preventDefault()
+    $(document).ready(function() {
+        $('table').dataTable()
+    })
+
+    $('#new_tenant').click(function() {
+        uni_modal("New Tenant", "manage_tenant.php", "mid-large")
+
+    })
+
+    $('.view_payment').click(function() {
+        uni_modal("Tenants Payments", "view_payment.php?id=" + $(this).attr('data-id'), "large")
+
+    })
+    $('.edit_tenant').click(function() {
+        uni_modal("Manage Tenant Details", "manage_tenant.php?id=" + $(this).attr('data-id'), "mid-large")
+
+    })
+    $('.delete_tenant').click(function() {
+        _conf("Are you sure to delete this Tenant?", "delete_tenant", [$(this).attr('data-id')])
+    })
+
+    function delete_tenant($id) {
         start_load()
         $.ajax({
-            url: 'ajax.php?action=save_track',
-            data: new FormData($(this)[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
+            url: 'ajax.php?action=delete_tenant',
             method: 'POST',
-            type: 'POST',
-            success: function(resp) {
-                resp = JSON.parse(resp)
-                if (resp.status == 1) {
-                    alert_toast("Data successfully saved", 'success')
-                    setTimeout(function() {
-                        location.reload()
-                    }, 800)
-
-                }
-
-            }
-        })
-    })
-    $('#tracking_id').on('keypress', function(e) {
-        if (e.which == 13) {
-            get_person()
-        }
-    })
-    $('#check').on('click', function(e) {
-        get_person()
-    })
-
-    function get_person() {
-        start_load()
-        $.ajax({
-            url: 'ajax.php?action=get_pdetails',
-            method: "POST",
             data: {
-                tracking_id: $('#tracking_id').val()
+                id: $id
             },
             success: function(resp) {
-                if (resp) {
-                    resp = JSON.parse(resp)
-                    if (resp.status == 1) {
-                        $('#name').html(resp.name)
-                        $('#address').html(resp.address)
-                        $('[name="person_id"]').val(resp.id)
-                        $('#details').show()
-                        end_load()
+                if (resp == 1) {
+                    alert_toast("Data successfully deleted", 'success')
+                    setTimeout(function() {
+                        location.reload()
+                    }, 1500)
 
-                    } else if (resp.status == 2) {
-                        alert_toast("Unknow tracking id.", 'danger');
-                        end_load();
-                    }
                 }
             }
         })
     }
 </script>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-    google.charts.load('current', {
-        'packages': ['corechart']
-    });
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-            ['Types', 'Booking'],
-            ['Single-Family Home', 11],
-            ['Townhouse', 2],
-            ['Condominium', 2],
-            ['Duplex', 2],
-            ['Tiny House', 7]
-        ]);
-
-        var options = {
-            title: 'Booking Trend'
-        };
-
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-        draw();
-
-        // Redraw the chart when the window is resized
-        window.addEventListener('resize', draw);
-
-        function draw() {
-            // Get the dimensions of the container
-            var chartContainer = document.getElementById('piechart');
-            var width = chartContainer.offsetWidth;
-            var height = chartContainer.offsetHeight;
-
-            // Set chart options
-            options.width = width;
-            options.height = height;
-
-            // Draw the chart with updated options
-            chart.draw(data, options);
-        }
-    }
-</script>
-<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
-    <p class="text-muted mb-1 mb-md-0">Copyright © 2024 <a href="https://www.mayurik.com" target="_blank">Tenant Management System Software</a> - Design By Mayuri K. Freelancer</p>
-
-</footer>

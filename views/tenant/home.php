@@ -1,4 +1,4 @@
-<?php include '../db_connect.php' ?>
+<?php include 'db_connect.php' ?>
 <style>
    span.float-right.summary_icon {
       font-size: 3rem;
@@ -75,45 +75,9 @@
                               </div>
                            </div>
                         </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=houses" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
                      </div>
                   </div>
-                  <div class="col-md-4 mb-3">
-                     <div class="card card-1">
-                        <div class="card-body card-1 bg-warning p-0">
-                           <div class="card-body text-white py-4">
-                              <div class="d-flex flex-row">
-                                 <div class="col-3 align-self-center">
-                                    <div class="round">
-                                       <span class="float-right summary_icon"> <i class="fa fa-user-friends "></i></span>
-                                    </div>
-                                 </div>
-                                 <div class="col-9 align-self-center text-right">
-                                    <div class="m-l-10">
-                                       <h3 class="text1">
-                                          <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                       </h3>
-                                       <p>Total Tenants</p>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                     </div>
-                  </div>
+
                   <div class="col-md-4 mb-3">
                      <div class="card card-1">
                         <div class="card-body card-1 bg-success p-0">
@@ -132,21 +96,16 @@
                                           echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'], 2) : 0;
                                           ?>
                                        </h3>
-                                       <p>Payments This Month</p>
+                                       <p>Payments History</p>
                                     </div>
                                  </div>
                               </div>
                            </div>
                         </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=invoices" class="text-primary float-right">View Payments <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
+
                      </div>
                   </div>
+
                   <div class="col-md-4 mb-3">
                      <div class="card card-1">
                         <div class="card-body card-1 bg-danger p-0">
@@ -154,87 +113,20 @@
                               <div class="d-flex flex-row">
                                  <div class="col-3 align-self-center">
                                     <div class="round">
-                                       <span class="float-right summary_icon"> <i class="fa fa-list"></i></span>
+                                       <span class="float-right summary_icon"> <i class="fa fa-clock"></i></span>
                                     </div>
                                  </div>
                                  <div class="col-9 align-self-center text-right">
                                     <div class="m-l-10">
                                        <h3 class="text1">
-                                          <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
+                                          <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?> Weeks
                                        </h3>
-                                       <p>Total Reports</p>
+                                       <p>Time Remained</p>
                                     </div>
                                  </div>
                               </div>
                            </div>
                         </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                     </div>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                     <div class="card card-1">
-                        <div class="card-body card-1 bg-info p-0">
-                           <div class="card-body text-white py-4">
-                              <div class="d-flex flex-row">
-                                 <div class="col-3 align-self-center">
-                                    <div class="round">
-                                       <span class="float-right summary_icon"> <i class="fa fa-home"></i></span>
-                                    </div>
-                                 </div>
-                                 <div class="col-9 align-self-center text-right">
-                                    <div class="m-l-10">
-                                       <h3 class="text1">
-                                          <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                       </h3>
-                                       <p>Total House Type</p>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
-                     </div>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                     <div class="card card-1">
-                        <div class="card-body card-1 bg-secondary p-0">
-                           <div class="card-body text-white py-4">
-                              <div class="d-flex flex-row">
-                                 <div class="col-3 align-self-center">
-                                    <div class="round">
-                                       <span class="float-right summary_icon"> <i class="fa fa-users"></i></span>
-                                    </div>
-                                 </div>
-                                 <div class="col-9 align-self-center text-right">
-                                    <div class="m-l-10">
-                                       <h3 class="text1">
-                                          <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
-                                       </h3>
-                                       <p>Total Users</p>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                        <!-- <div class="card-footer">
-                           <div class="row">
-                               <div class="col-lg-12">
-                                   <a href="index.php?page=tenants" class="text-primary float-right">View List <span class="fa fa-angle-right"></span></a>
-                               </div>
-                           </div>
-                           </div> -->
                      </div>
                   </div>
                </div>
@@ -358,7 +250,3 @@
       }
    }
 </script>
-<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
-   <p class="text-muted mb-1 mb-md-0">Copyright © 2024 <a href="https://www.mayurik.com" target="_blank">Tenant Management System Software</a> - Design By Mayuri K. Freelancer</p>
-
-</footer>

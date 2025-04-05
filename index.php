@@ -81,7 +81,16 @@
   <main id="view-panel">
     <?php
     // Default page if none specified
-    $default_page = 'home';
+    if($_SESSION['login_type'] == 1){
+      $default_page = 'home';
+    }else if($_SESSION['login_type'] == 2){
+      $default_page = 'views/owner/home';
+    }else if($_SESSION['login_type'] == 3){
+      $default_page = 'views/manager/home';
+    }else if($_SESSION['login_type'] == 4){
+      $default_page = 'views/tenant/home';
+    }
+
     $allowed_pages = [
       'home',
       'categories',
@@ -94,7 +103,24 @@
       'balance_report',
       'users',
 
-      'views/owner/home'
+      'views/owner/home',
+      'views/owner/apartments',
+      'views/owner/managers',
+      'views/owner/tenants',
+      'views/owner/payments',
+      'views/owner/reports',
+
+      'views/manager/home',
+      'views/manager/tenants',
+      'views/manager/payments',
+      'views/manager/apartments',
+
+      'views/tenant/home',
+      'views/tenant/payments',
+      'views/tenant/apartment_details',
+      'views/tenant/contracts'
+
+
     ];
 
     // Decode and sanitize the requested page

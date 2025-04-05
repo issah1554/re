@@ -65,32 +65,39 @@
                         <span class='icon-field'><i data-feather="users"></i></span> Users
                     </a>
                 </ul>
+
             <?php elseif ($_SESSION['login_type'] == 2): ?>
                 <ul class="p-0">
                     <a href="index.php?page=<?php echo base64_encode('views/owner/home'); ?>" class="nav-item nav-home">
                         <span class='icon-field'><i data-feather="airplay"></i></span> Dashboard
                     </a>
 
-                    <li class="has_sub">
+                    <!-- <li class="has_sub">
                         <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
                             <i data-feather="home"></i>
-                            <span> House</span> <span class="float-right">
+                            <span> Appartments</span> <span class="float-right">
                                 <i class="mdi mdi-chevron-right"></i>
                             </span>
                         </a>
                         <ul class="list-unstyled">
                             <li><a href="index.php?page=<?php echo base64_encode('views/owner/houses'); ?>">Add</a></li>
-                            <li><a href="index.php?page=<?php echo base64_encode('manage_houses'); ?>">Manage</a></li>
+                            <li><a href="index.php?page=<?php echo base64_encode('views/owner/home'); ?>">Manage</a></li>
                         </ul>
-                    </li>
+                    </li> -->
 
-                    <a href="index.php?page=<?php echo base64_encode('tenants'); ?>" class="nav-item nav-tenants">
+                    <a href="index.php?page=<?php echo base64_encode('views/owner/apartments'); ?>" class="nav-item nav-tenants">
+                        <span class='icon-field'><i data-feather="home"></i></span> Appartments
+                    </a>
+
+                    <a href="index.php?page=<?php echo base64_encode('views/owner/tenants'); ?>" class="nav-item nav-tenants">
                         <span class='icon-field'><i data-feather="users"></i></span> Your Tenants
                     </a>
-                    <a href="index.php?page=<?php echo base64_encode('tenants'); ?>" class="nav-item nav-managers">
+
+                    <a href="index.php?page=<?php echo base64_encode('views/owner/managers'); ?>" class="nav-item nav-managers">
                         <span class='icon-field'><i data-feather="users"></i></span> Your Managers
                     </a>
-                    <a href="index.php?page=<?php echo base64_encode('invoices'); ?>" class="nav-item nav-invoices">
+
+                    <a href="index.php?page=<?php echo base64_encode('views/owner/payments'); ?>" class="nav-item nav-invoices">
                         <span class='icon-field'><i data-feather="credit-card"></i></span> Payments
                     </a>
 
@@ -113,30 +120,19 @@
                         <span class='icon-field'><i data-feather="airplay"></i></span> Dashboard
                     </a>
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
-                            <i data-feather="home"></i>
-                            <span> House</span> <span class="float-right">
-                                <i class="mdi mdi-chevron-right"></i>
-                            </span>
-                        </a>
-                        <ul class="list-unstyled">
-                            <li><a href="index.php?page=<?php echo base64_encode('views/manager/houses'); ?>">Add</a></li>
-                            <li><a href="index.php?page=<?php echo base64_encode('views/manager/manage_houses'); ?>">Manage</a></li>
-                        </ul>
-                    </li>
+                    <a href="index.php?page=<?php echo base64_encode('views/manager/apartments'); ?>" class="nav-item nav-tenants ">
+                        <span class='icon-field'><i data-feather="home"></i></span> Apartments
+                    </a>
 
                     <a href="index.php?page=<?php echo base64_encode('views/manager/tenants'); ?>" class="nav-item nav-tenants">
-                        <span class='icon-field'><i data-feather="users"></i></span> Your Tenants
+                        <span class='icon-field'><i data-feather="users"></i></span> Tenants
                     </a>
-                    <a href="index.php?page=<?php echo base64_encode('views/manager/tenants'); ?>" class="nav-item nav-managers">
-                        <span class='icon-field'><i data-feather="users"></i></span> Your Managers
-                    </a>
-                    <a href="index.php?page=<?php echo base64_encode('views/manager/invoices'); ?>" class="nav-item nav-invoices">
+
+                    <a href="index.php?page=<?php echo base64_encode('views/manager/payments'); ?>" class="nav-item nav-invoices">
                         <span class='icon-field'><i data-feather="credit-card"></i></span> Payments
                     </a>
 
-                    <li class="has_sub">
+                    <!-- <li class="has_sub">
                         <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
                             <i data-feather="align-justify"></i>
                             <span> Reports</span> <span class="float-right">
@@ -147,50 +143,30 @@
                             <li><a href="index.php?page=<?php echo base64_encode('views/manager/payment_report'); ?>">Monthly Payments Report</a></li>
                             <li><a href="index.php?page=<?php echo base64_encode('views/manager/balance_report'); ?>">Rental Balances Report</a></li>
                         </ul>
-                    </li>
+                    </li> -->
                 </ul>
-                
+
             <?php elseif ($_SESSION['login_type'] == 4): ?>
                 <ul class="p-0">
-                    <a href="index.php?page=<?php echo base64_encode('views/owner/home'); ?>" class="nav-item nav-home">
+                    <a href="index.php?page=<?php echo base64_encode('views/tenant/home'); ?>" class="nav-item nav-home">
                         <span class='icon-field'><i data-feather="airplay"></i></span> Dashboard
                     </a>
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
-                            <i data-feather="home"></i>
-                            <span> House</span> <span class="float-right">
-                                <i class="mdi mdi-chevron-right"></i>
-                            </span>
-                        </a>
-                        <ul class="list-unstyled">
-                            <li><a href="index.php?page=<?php echo base64_encode('views/owner/houses'); ?>">Add</a></li>
-                            <li><a href="index.php?page=<?php echo base64_encode('manage_houses'); ?>">Manage</a></li>
-                        </ul>
-                    </li>
-
-                    <a href="index.php?page=<?php echo base64_encode('tenants'); ?>" class="nav-item nav-tenants">
-                        <span class='icon-field'><i data-feather="users"></i></span> Your Tenants
-                    </a>
-                    <a href="index.php?page=<?php echo base64_encode('tenants'); ?>" class="nav-item nav-managers">
-                        <span class='icon-field'><i data-feather="users"></i></span> Your Managers
-                    </a>
-                    <a href="index.php?page=<?php echo base64_encode('invoices'); ?>" class="nav-item nav-invoices">
-                        <span class='icon-field'><i data-feather="credit-card"></i></span> Payments
+                    <a href="index.php?page=<?php echo base64_encode('views/tenant/contracts'); ?>" class="nav-item nav-tenants">
+                        <span class='icon-field'><i data-feather="file-text"></i></span>Contracts
                     </a>
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
-                            <i data-feather="align-justify"></i>
-                            <span> Reports</span> <span class="float-right">
-                                <i class="mdi mdi-chevron-right"></i>
-                            </span>
-                        </a>
-                        <ul class="list-unstyled">
-                            <li><a href="index.php?page=<?php echo base64_encode('payment_report'); ?>">Monthly Payments Report</a></li>
-                            <li><a href="index.php?page=<?php echo base64_encode('balance_report'); ?>">Rental Balances Report</a></li>
-                        </ul>
-                    </li>
+                    <a href="index.php?page=<?php echo base64_encode('views/tenant/apartment_details'); ?>" class="nav-item nav-managers">
+                        <span class='icon-field'><i data-feather="users"></i></span> Apartment details
+                    </a>
+
+                    <a href="index.php?page=<?php echo base64_encode('views/tenant/payments'); ?>" class="nav-item nav-invoices">
+                        <span class='icon-field'><i data-feather="credit-card"></i></span> Your Payments
+                    </a>
+                    <a href="index.php?page=<?php echo base64_encode('views/tenant/payments'); ?>" class="nav-item nav-invoices">
+                        <span class='icon-field'><i data-feather="user"></i></span> support
+                    </a>
+
                 </ul>
 
             <?php endif; ?>
