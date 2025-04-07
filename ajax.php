@@ -66,7 +66,8 @@ if ($_SESSION['login_type'] == 1) {
 	if ($action == "save_category") {
 		$save = $crud->save_category();
 		if ($save)
-			echo $save;	}
+			echo $save;
+	}
 
 	if ($action == "edit_category") {
 		$save = $crud->edit_category();
@@ -144,7 +145,7 @@ if ($_SESSION['login_type'] == 1) {
 
 
 	ob_end_flush();
-} 
+}
 
 
 
@@ -170,7 +171,15 @@ if ($_SESSION['login_type'] == 3) {
 		if ($save)
 			echo $save;
 	}
+
+	if ($action == 'save_payment') {
+		$save = $crud->save_payment();
+		if ($save)
+			echo $save;
+	}
 } 
+
+
 
 else if ($_SESSION['login_type'] == 4) {
 	include 'controllers/tenant_controller.php';

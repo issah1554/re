@@ -19,47 +19,6 @@ class Action
         ob_end_flush();
     }
 
-    function login()
-    {
-        extract($_POST);
-
-        // Check if username and password are provided
-        if (empty($username) || empty($password)) {
-            return 0; // Invalid input
-        }
-
-        // Prepare and execute query
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-
-            // Verify password (assuming passwords are hashed)
-            if (password_verify($password, $user['password'])) {
-                // Set session variables
-                $_SESSION['login_id'] = $user['id'];
-                $_SESSION['login_type'] = $user['type'];
-                $_SESSION['login_name'] = $user['first_name'] . ' ' . $user['last_name'];
-                $_SESSION['login_username'] = $user['username'];
-                return 1; // Successful login
-            }
-        }
-
-        return 2; // Invalid credentials
-    }
-
-    function logout()
-    {
-        session_destroy();
-        foreach ($_SESSION as $key => $value) {
-            unset($_SESSION[$key]);
-        }
-        header("location:login.php");
-    }
-
     function assign_tenant()
     {
         // Verify session first
@@ -301,37 +260,45 @@ class Action
         return ['status' => 'error', 'msg' => 'Failed to upload file'];
     }
 
-
-
-
-
-    function delete_tenant()
+    public function save_payment()
     {
         extract($_POST);
-        $sql = "DELETE FROM tenants WHERE id=$id";
-        if ($this->db->query($sql) === TRUE) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
 
-    function create_payment()
-    {
-        extract($_POST);
-        $data = array(
-            'tenant_id' => $tenant_id,
-            'amount' => $amount,
-            'date' => date('Y-m-d H:i:s'),
-            'status' => 1
-        );
-        $columns = implode(',', array_keys($data));
-        $values = implode("','", array_values($data));
-        $sql = "INSERT INTO payments ($columns) VALUES ('$values')";
-        if ($this->db->query($sql) === TRUE) {
+        // Validate required fields
+        if (empty($tenant_id) || empty($amount) || empty($from_date) || empty($to_date)) {
+            return "All required fields must be filled";
+        }
+
+        // Validate amount is numeric and positive
+        if (!is_numeric($amount) || $amount <= 0) {
+            return "Invalid amount specified";
+        }
+
+        // Validate date range
+        if (strtotime($to_date) <= strtotime($from_date)) {
+            return "End date must be after start date";
+        }
+
+        // Prepare data
+        $data = "";
+        foreach ($_POST as $k => $v) {
+            if (!in_array($k, ['id'])) {
+                $v = $this->db->real_escape_string($v);
+                if (empty($data)) {
+                    $data .= " $k = '$v' ";
+                } else {
+                    $data .= ", $k = '$v' ";
+                }
+            }
+        }
+
+        // Save to database
+        $sql = "INSERT INTO payments SET $data";
+        $save = $this->db->query($sql);
+
+        if ($save) {
             return 1;
         } else {
-            return 0;
+            return "Failed to save payment: " . $this->db->error;
         }
-    }
-}
+    }}
