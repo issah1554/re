@@ -270,14 +270,6 @@
       $(this).remove();
     })
   })
-  $('.datetimepicker').datetimepicker({
-    format: 'Y/m/d H:i',
-    startDate: '+3d'
-  })
-  $('.select2').select2({
-    placeholder: "Please select here",
-    width: "100%"
-  })
 </script>
 
 </html>
