@@ -146,6 +146,19 @@ if ($_SESSION['login_type'] == 1) {
 	ob_end_flush();
 } 
 
+if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 4)
+    include 'controllers/owner_controller.php';  // Include your owner controller
+    $crud = new Action();
+
+    // Handle adding an apartment
+    if ($action == 'add_apartment') {
+        $response = $crud->add_apartment();  // Call the add_apartment function
+        echo $response;  // Output the response (success or error)
+    }
+}
+
+
+
 
 
 if ($_SESSION['login_type'] == 3) {
