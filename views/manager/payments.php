@@ -16,12 +16,12 @@
                     <div class="card-header">
                         <b>List of Payments</b>
                         <span class="float:right">
-                            <a 
-                            class="btn btn-primary btn-block btn-sm col-sm-2 float-right" 
-                            href="javascript:void(0)" 
-                            data-toggle="modal"
-                            data-target="#paymentModal"
-                            id="new_payment" >
+                            <a
+                                class="btn btn-primary btn-block btn-sm col-sm-2 float-right"
+                                href="javascript:void(0)"
+                                data-toggle="modal"
+                                data-target="#paymentModal"
+                                id="new_payment">
                                 <i class="fa fa-plus"></i> New Entry
                             </a>
                         </span>
@@ -36,6 +36,7 @@
                                     <th class="">Amount</th>
                                     <th class="">From Date</th>
                                     <th class="">Upto Date</th>
+                                    <th>Status</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -49,7 +50,8 @@
                                     p.amount,
                                     p.from_date as from_date,
                                     p.to_date as to_date,
-                                    p.id
+                                    p.id,
+                                    p.verified_by
                                     FROM users as tenant
                                     INNER JOIN payments as p ON tenant.id = p.tenant_id
                                     INNER JOIN apartments as apt ON apt.tenant_id = tenant.id
@@ -73,6 +75,9 @@
                                         <td class="">
                                             <p><b><?php echo date('M d, Y', strtotime($row['to_date'])) ?></b></p>
                                         </td>
+                                        <td>
+                                            <p><b><?php echo $row['verified_by'] == 1 ? '<div class="badge badge-success p-2">Verified</div>' : '<div class="badge badge-secondary p-2">Pending</div>' ?></b></p>
+                                        </td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>">View</button>
                                         </td>
@@ -83,13 +88,16 @@
                     </div>
                 </div>
             </div>
+            <!-- End Table Panel -->
+
+
             <!-- Payment Modal -->
             <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
+                        <div class="modal-header bg-light">
                             <h5 class="modal-title" id="paymentModalLabel">New Payment Entry</h5>
-                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -103,11 +111,11 @@
                                                 <option value="" selected disabled>-- Select Tenant --</option>
                                                 <?php
                                                 $tenants = $conn->query("
-                                        SELECT u.id, CONCAT(u.first_name,' ',u.last_name) as name, a.number 
-                                        FROM users u 
-                                        INNER JOIN apartments a ON a.tenant_id = u.id 
-                                        WHERE u.type = 4 AND a.manager_id = '{$_SESSION['login_id']}'
-                                    ");
+                                                    SELECT u.id, CONCAT(u.first_name,' ',u.last_name) as name, a.number 
+                                                    FROM users u 
+                                                    INNER JOIN apartments a ON a.tenant_id = u.id 
+                                                    WHERE u.type = 4 AND a.manager_id = '{$_SESSION['login_id']}'
+                                                ");
                                                 while ($row = $tenants->fetch_assoc()):
                                                 ?>
                                                     <option value="<?php echo $row['id'] ?>" data-apartment="<?php echo $row['number'] ?>">
@@ -128,7 +136,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="amount" class="control-label">Amount (Tsh)</label>
-                                            <input type="number" class="form-control" name="amount" id="amount" step="0.01" min="0" required>
+                                            <input
+                                                type="text"
+                                                inputmode="numeric"
+                                                class="form-control"
+                                                name="amount"
+                                                id="amount"
+                                                min="0"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);"
+                                                required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -152,10 +168,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label for="remarks" class="control-label">Remarks</label>
                                     <textarea class="form-control" name="remarks" id="remarks" rows="2"></textarea>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -165,78 +181,98 @@
                     </div>
                 </div>
             </div>
-            <!-- Table Panel -->
+            <!-- End Payment Modal -->
+
         </div>
     </div>
 
 </div>
 <script>
-    $(document).ready(function() {
-        // Initialize DataTable with export buttons
-        new DataTable('#example', {
-            layout: {
-                topStart: {
-                    buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
-                }
-            }
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update apartment number when tenant is selected
+        const tenantSelect = document.getElementById('tenant_id');
+        const apartmentInput = document.getElementById('apartment_no');
 
-        // Show apartment number when tenant is selected
-        $('#tenant_id').change(function() {
-            var apartment = $(this).find(':selected').data('apartment');
-            $('#apartment_no').val(apartment);
-        });
+        if (tenantSelect && apartmentInput) {
+            tenantSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                apartmentInput.value = selectedOption.dataset.apartment || '';
+            });
+        }
 
-        // Set default date ranges
-        $('#from_date').val(new Date().toISOString().slice(0, 10));
-        var nextMonth = new Date();
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        $('#to_date').val(nextMonth.toISOString().slice(0, 10));
+        // Handle form submission
+        const paymentForm = document.getElementById('paymentForm');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-        // New Payment button click handler
-        $('#new_payment').click(function() {
-            $('#paymentForm')[0].reset();
-            $('#apartment_no').val('');
-            $('#paymentModal').modal('show');
-        });
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Processing...';
 
-        // Form submission handler
-        $('#paymentForm').submit(function(e) {
-            e.preventDefault();
-            start_loader();
+                // Collect form data
+                const formData = new FormData(this);
 
-            $.ajax({
-                url: 'ajax.php?action=save_payment',
-                method: 'POST',
-                data: $(this).serialize(),
-                error: err => {
-                    console.log(err);
-                    alert_toast("An error occurred", 'error');
-                    end_loader();
-                },
-                success: function(resp) {
-                    if (resp == 1) {
-                        alert_toast("Payment successfully saved", 'success');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        alert_toast("Error: " + resp, 'error');
-                        end_loader();
-                    }
-                }
+                // Send AJAX request
+                fetch('ajax.php?action=save_payment', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        try {
+                            console.log(data);
+                            data = JSON.parse(data);
+                            if (data.status === 'success') {
+                                alert('Payment saved successfully!');
+                                // Optionally, refresh the page or update the table
+                                location.reload();
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', e);
+                            alert('An error occurred while processing the response');
+                            return;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while saving the payment');
+                    })
+                    .finally(() => {
+                        // Restore button state
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    });
+            });
+        }
+
+        // Handle view payment buttons
+        document.querySelectorAll('.view_payment').forEach(button => {
+            button.addEventListener('click', function() {
+                const paymentId = this.dataset.id;
+                // Implement your view modal logic here
+                console.log('View payment:', paymentId);
             });
         });
 
-        // View Payment button handler
-        $('.view_payment').click(function() {
-            var payment_id = $(this).attr('data-id');
-            // You can implement a view modal here if needed
-            alert("Viewing payment ID: " + payment_id);
-        });
+        // Amount input validation
+        const amountInput = document.getElementById('amount');
+        if (amountInput) {
+            amountInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9.]/g, '');
+
+                // Ensure only one decimal point
+                if ((this.value.match(/\./g) || []).length > 1) {
+                    this.value = this.value.substring(0, this.value.lastIndexOf('.'));
+                }
+            });
+        }
     });
 </script>
-
 <style>
     td {
         vertical-align: middle !important;

@@ -260,45 +260,87 @@ class Action
         return ['status' => 'error', 'msg' => 'Failed to upload file'];
     }
 
-    public function save_payment()
+    function save_payment()
     {
-        extract($_POST);
+        // Get POST data
+        $tenant_id = $_POST['tenant_id'] ?? '';
+        $amount = $_POST['amount'] ?? '';
+        $payment_date = $_POST['payment_date'] ?? '';
+        $from_date = $_POST['from_date'] ?? '';
+        $to_date = $_POST['to_date'] ?? '';
 
         // Validate required fields
-        if (empty($tenant_id) || empty($amount) || empty($from_date) || empty($to_date)) {
-            return "All required fields must be filled";
+        if (empty($tenant_id) || empty($amount) || empty($payment_date) || empty($from_date) || empty($to_date)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'All fields are required'
+            ]);
         }
 
-        // Validate amount is numeric and positive
+        // Validate amount is numeric
         if (!is_numeric($amount) || $amount <= 0) {
-            return "Invalid amount specified";
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Amount must be a positive number'
+            ]);
         }
 
-        // Validate date range
-        if (strtotime($to_date) <= strtotime($from_date)) {
-            return "End date must be after start date";
+        // Validate dates
+        $payment_date_obj = DateTime::createFromFormat('Y-m-d', $payment_date);
+        $from_date_obj = DateTime::createFromFormat('Y-m-d', $from_date);
+        $to_date_obj = DateTime::createFromFormat('Y-m-d', $to_date);
+
+        if (!$payment_date_obj || !$from_date_obj || !$to_date_obj) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Invalid date format'
+            ]);
         }
 
-        // Prepare data
-        $data = "";
-        foreach ($_POST as $k => $v) {
-            if (!in_array($k, ['id'])) {
-                $v = $this->db->real_escape_string($v);
-                if (empty($data)) {
-                    $data .= " $k = '$v' ";
-                } else {
-                    $data .= ", $k = '$v' ";
-                }
+        // Check date ranges
+        if ($to_date_obj <= $from_date_obj) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'End date must be after start date'
+            ]);
+        }
+
+        // Prepare data for database
+        $data = [
+            'tenant_id' => $this->db->real_escape_string($tenant_id),
+            'amount' => floatval($amount),
+            'payment_date' => $payment_date_obj->format('Y-m-d'),
+            'from_date' => $from_date_obj->format('Y-m-d'),
+            'to_date' => $to_date_obj->format('Y-m-d'),
+            'created_by' => $_SESSION['login_id'],
+            'date_created' => date('Y-m-d H:i:s')
+        ];
+
+        // Build SQL query
+        $columns = implode(', ', array_keys($data));
+        $values = "'" . implode("', '", array_values($data)) . "'";
+        $sql = "INSERT INTO payments ($columns) VALUES ($values)";
+
+        // Execute query
+        try {
+            $result = $this->db->query($sql);
+
+            if ($result) {
+                return json_encode([
+                    'status' => 'success',
+                    'message' => 'Payment recorded successfully'
+                ]);
+            } else {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Database error: ' . $this->db->error
+                ]);
             }
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Exception: ' . $e->getMessage()
+            ]);
         }
-
-        // Save to database
-        $sql = "INSERT INTO payments SET $data";
-        $save = $this->db->query($sql);
-
-        if ($save) {
-            return 1;
-        } else {
-            return "Failed to save payment: " . $this->db->error;
-        }
-    }}
+    }
+}
