@@ -117,7 +117,12 @@
                                                     <h3 class="text1">
                                                         <?php
                                                         $payment = $conn->query("SELECT sum(amount) as paid FROM payments where date(date_created) = '" . date('Y-m-d') . "' ");
-                                                        echo $payment->num_rows > 0 ? number_format($payment->fetch_array()['paid'], 2) : 0;
+                                                        if ($payment->num_rows > 0) {
+                                                            $paid = $payment->fetch_array()['paid'] ?? 0;
+                                                            echo number_format((float)$paid, 2);
+                                                        } else {
+                                                            echo '0.00';
+                                                        }                                                      
                                                         ?>
                                                     </h3>
                                                     <p>Payments This Month</p>
