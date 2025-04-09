@@ -25,26 +25,12 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php
-                                $i = 1;
-                                $managers = $conn->query("SELECT id, CONCAT(first_name, ' ', last_name) as name, phone, username as email FROM users WHERE type = 3");
-                                while ($row = $managers->fetch_assoc()):
-                                ?>
-                                    <tr>
-                                        <td class="text-center"><?php echo $i++ ?></td>
-                                        <td><?php echo ucwords($row['name']) ?></td>
-                                        <td><?php echo $row['phone'] ?></td>
-                                        <td><?php echo $row['email'] ?></td>
-                                        <td class="text-center">
-                                            <button class="btn btn-sm btn-outline-info edit_manager" data-id="<?php echo $row['id'] ?>"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete_manager" data-id="<?php echo $row['id'] ?>"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
+                            <tbody id="managersTableBody">
+                                <!-- Managers will be inserted here dynamically -->
                             </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -291,4 +277,47 @@
                 return /^[0-9]{10,15}$/.test(phone);
             }
         });
+    </script>
+
+    <script>
+                $(document).ready(function() {
+            // Function to load managers
+            function loadManagers() {
+                $.ajax({
+                    url: 'ajax.php',
+                    method: 'GET',
+                    data: { action: 'get_managers' },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response && response.status !== 'error') {
+                            var managers = response.data;
+                            var tableBody = $('#managersTableBody');
+                            tableBody.empty(); // Clear the current table content
+
+                            // Loop through the managers and append rows to the table
+                            $.each(managers, function(index, manager) {
+                                var row = '<tr>' +
+                                            '<td class="text-center">' + (index + 1) + '</td>' +
+                                            '<td>' + manager.name + '</td>' +
+                                            '<td>' + manager.phone + '</td>' +
+                                            '<td>' + manager.email + '</td>' +
+                                            '<td class="text-center">' +
+                                                '<button class="btn btn-sm btn-outline-info edit_manager" data-id="' + manager.id + '"><i class="fas fa-edit"></i></button>' +
+                                                '<button class="btn btn-sm btn-outline-danger delete_manager" data-id="' + manager.id + '"><i class="fas fa-trash"></i></button>' +
+                                            '</td>' +
+                                        '</tr>';
+                                tableBody.append(row);
+                            });
+                        }
+                    },
+                    error: function() {
+                        alert('Error loading managers');
+                    }
+                });
+            }
+
+            // Load managers when the page is ready
+            loadManagers();
+        });
+
     </script>

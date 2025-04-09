@@ -58,16 +58,16 @@ class Action
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
+    
         if (!isset($_SESSION['login_id'])) {
             return json_encode(['status' => 'error', 'msg' => 'Session expired. Please login again.']);
         }
-
+    
         // Verify owner session
         if (!isset($_SESSION['login_id']) || $_SESSION['login_type'] != 2) {
             return json_encode(['status' => 'error', 'msg' => 'Unauthorized access']);
         }
-
+    
         // Validate required fields
         $required = ['manager_fname', 'manager_lname', 'manager_phone', 'manager_email'];
         foreach ($required as $field) {
@@ -75,7 +75,7 @@ class Action
                 return json_encode(['status' => 'error', 'msg' => "Please fill all required fields"]);
             }
         }
-
+    
         // Sanitize inputs
         $first_name = $this->sanitize($_POST['manager_fname']);
         $last_name = $this->sanitize($_POST['manager_lname']);
@@ -84,17 +84,17 @@ class Action
         $gender = $this->sanitize($_POST['gender'] ?? 'male');
         $manager_id = $_SESSION['login_id'];
         $password = password_hash('rental', PASSWORD_DEFAULT); // Default password
-
+    
         // Validate email format
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return json_encode(['status' => 'error', 'msg' => 'Invalid email format']);
         }
-
+    
         // Check if email exists
         if ($this->email_exists($email)) {
             return json_encode(['status' => 'error', 'msg' => 'Email already in use']);
         }
-
+    
         // Handle file upload
         $avatar_path = null;
         if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == UPLOAD_ERR_OK) {
@@ -104,30 +104,31 @@ class Action
             }
             $avatar_path = $upload['path'];
         }
-
+    
         // Create tenant account
         try {
             $this->db->begin_transaction();
             $name = $first_name . ' ' . $last_name;
-
-            // Insert user
+    
+            // Insert user, linking the manager to the owner who created them
             $stmt = $this->db->prepare("INSERT INTO users
-                (name,first_name, last_name, username, password, phone, gender, type, avatar) 
-                VALUES (?,?, ?, ?, ?, ?, ?, 3, ?)");
-            $stmt->bind_param("ssssssss",$name,$first_name, $last_name, $email, $password, $phone, $gender, $avatar_path);
-
+                (name, first_name, last_name, username, password, phone, gender, type, avatar, created_by) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, 3, ?, ?)"); // '3' means Manager, and 'created_by' links the user to the owner
+    
+            $stmt->bind_param("ssssssssi", $name, $first_name, $last_name, $email, $password, $phone, $gender, $avatar_path, $_SESSION['login_id']);
+    
             if (!$stmt->execute()) {
                 throw new Exception('Failed to create manager account');
             }
-
+    
             $manager_id = $stmt->insert_id;
             $stmt->close();
-
-            $this->db->commit();            
-
+    
+            $this->db->commit();
+    
             return json_encode([
                 'status' => 'success',
-                'msg' => 'manager created successfully',
+                'msg' => 'Manager created successfully',
                 'manager_id' => $manager_id
             ]);
         } catch (Exception $e) {
@@ -135,6 +136,7 @@ class Action
             return json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
         }
     }
+    
 
     private function sanitize($input)
     {
@@ -184,5 +186,39 @@ class Action
      }
  
     
-}    
+
+
+     public function get_manager() {
+        // Ensure the session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    
+        // Make sure the user is logged in
+        if (!isset($_SESSION['login_id'])) {
+            return json_encode(['status' => 'error', 'msg' => 'User not authenticated']);
+        }
+    
+        // Get the logged-in user's ID (the owner ID)
+        $owner_id = $_SESSION['login_id'];
+    
+        // Prepare the query to select managers created by the specific owner
+        $stmt = $this->db->prepare("SELECT id, CONCAT(first_name, ' ', last_name) AS name, phone, username AS email 
+                                    FROM users 
+                                    WHERE type = 3 AND created_by = ?");
+        $stmt->bind_param("i", $owner_id); // Bind the owner ID to the query
+    
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $managers = [];
+        while ($row = $result->fetch_assoc()) {
+            $managers[] = $row;
+        }
+    
+        // Return the list of managers as JSON
+        return json_encode(['status' => 'success', 'data' => $managers]);
+    }
+    
+}
 ?>

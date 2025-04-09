@@ -160,22 +160,24 @@ if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 
     
     
 	if ($action == 'create_manager') {
-		$save = $crud->create_manager();
-		if ($save)
-			echo $save;
+		$response = $crud->create_manager();
+		if ($response)
+			echo $response;
 	}
 
-    if ($action == 'get_managers') {
-        $stmt = $conn->query("SELECT id, CONCAT(first_name, ' ', last_name) AS name, phone, email FROM users WHERE type = 3");
-        $managers = [];
-        while ($row = $stmt->fetch_assoc()) {
-            $managers[] = $row;
-        }
-        echo json_encode($managers); // Return the list of managers as JSON
-    }
+	if (isset($_GET['action']) && $_GET['action'] == 'get_managers') {
+		// Get the response from the get_manager method
+		$response = $crud->get_manager();
+	
+		// If the response is not empty, return it
+		if ($response) {
+			echo $response;
+		} else {
+			// If no managers found, return an error response
+			echo json_encode(['status' => 'error', 'msg' => 'No managers found']);
+		}
+	}
 }
-
-
 
 
 
