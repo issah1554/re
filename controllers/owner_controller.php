@@ -219,6 +219,34 @@ class Action
         // Return the list of managers as JSON
         return json_encode(['status' => 'success', 'data' => $managers]);
     }
+
+    
+    public function assign_manager() {
+        if (!isset($_POST['apartment_id'], $_POST['manager_id'])) {
+            return json_encode(['status' => 'error', 'message' => 'Missing parameters']);
+        }
+    
+        $apartmentId = $_POST['apartment_id'];
+        $managerId = $_POST['manager_id'];
+    
+        // Ensure the database connection is established
+        global $conn;
+        if (!$conn) {
+            return json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+        }
+    
+        // Example: Update the apartment's manager_id
+        try {
+            $stmt = $conn->prepare("UPDATE apartments SET manager_id = ? WHERE id = ?");
+            if ($stmt->execute([$managerId, $apartmentId])) {
+                return json_encode(['status' => 'success', 'message' => 'Manager assigned successfully']);
+            } else {
+                return json_encode(['status' => 'error', 'message' => 'Failed to assign manager']);
+            }
+        } catch (Exception $e) {
+            return json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
     
 }
 ?>

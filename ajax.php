@@ -177,6 +177,24 @@ if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 
 			echo json_encode(['status' => 'error', 'msg' => 'No managers found']);
 		}
 	}
+
+
+	include 'db_connect.php';
+
+	if (isset($_POST['action']) && $_POST['action'] == 'assign_manager') 
+	{
+		$response = $crud->assign_manager();
+		if ($response) {
+			// Ensure $response is always valid JSON
+			echo $response;
+		} else {
+			echo json_encode(['status' => 'error', 'message' => 'Unknown error']);
+		}
+	}
+	
+	
+
+
 }
 
 
