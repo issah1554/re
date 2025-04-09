@@ -147,7 +147,8 @@ if ($_SESSION['login_type'] == 1) {
 	ob_end_flush();
 }
 
-if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 4)
+
+if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 2)
     include 'controllers/owner_controller.php';  // Include your owner controller
     $crud = new Action();
 
@@ -156,7 +157,24 @@ if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 
         $response = $crud->add_apartment();  // Call the add_apartment function
         echo $response;  // Output the response (success or error)
     }
+    
+    
+	if ($action == 'create_manager') {
+		$save = $crud->create_manager();
+		if ($save)
+			echo $save;
+	}
+
+    if ($action == 'get_managers') {
+        $stmt = $conn->query("SELECT id, CONCAT(first_name, ' ', last_name) AS name, phone, email FROM users WHERE type = 3");
+        $managers = [];
+        while ($row = $stmt->fetch_assoc()) {
+            $managers[] = $row;
+        }
+        echo json_encode($managers); // Return the list of managers as JSON
+    }
 }
+
 
 
 

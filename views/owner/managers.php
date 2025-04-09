@@ -1,24 +1,17 @@
 <?php include('db_connect.php'); ?>
 
 <div class="container-fluid">
-
     <div class="col-lg-12">
-        <div class="row mb-4 mt-4">
-            <div class="col-md-12">
-
-            </div>
-        </div>
-        <div class="row">
-            <!-- FORM Panel -->
-
-            <!-- Table Panel -->
+        <div class="row mb-3 mt-3">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
                         <b>List of Managers</b>
-                        <span class="float:right"><a class="btn btn-primary btn-block btn-sm col-sm-2 float-right" href="javascript:void(0)" id="new_tenant">
-                                <i class="fa fa-plus"></i> New Manager
-                            </a>
+                        <span class="float:right">
+                        <a class="btn btn-primary btn-sm float-right" href="javascript:void(0)" data-toggle="modal" data-target="#tModal">
+                            <i class="fa fa-plus"></i> New Manager
+                        </a>
+
                         </span>
                     </div>
                     <div class="card-body">
@@ -26,49 +19,26 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">#</th>
-                                    <th class="">Name</th>
-                                    <th class="">House Rented</th>
-                                    <th class="">Monthly Rate</th>
-                                    <th class="">Outstanding Balance</th>
-                                    <th class="">Last Payment</th>
-                                    <th class="text-center">Action</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 $i = 1;
-                                $tenant = $conn->query("SELECT t.*,concat(t.lastname,', ',t.firstname,' ',t.middlename) as name,h.house_no,h.price FROM tenants t inner join houses h on h.id = t.house_id where t.status = 1 order by h.house_no desc ");
-                                while ($row = $tenant->fetch_assoc()):
-                                    $months = abs(strtotime(date('Y-m-d') . " 23:59:59") - strtotime($row['date_in'] . " 23:59:59"));
-                                    $months = floor(($months) / (30 * 60 * 60 * 24));
-                                    $payable = $row['price'] * $months;
-                                    $paid = $conn->query("SELECT SUM(amount) as paid FROM payments where tenant_id =" . $row['id']);
-                                    $last_payment = $conn->query("SELECT * FROM payments where tenant_id =" . $row['id'] . " order by unix_timestamp(date_created) desc limit 1");
-                                    $paid = $paid->num_rows > 0 ? $paid->fetch_array()['paid'] : 0;
-                                    $last_payment = $last_payment->num_rows > 0 ? date("M d, Y", strtotime($last_payment->fetch_array()['date_created'])) : 'N/A';
-                                    $outstanding = $payable - $paid;
+                                $managers = $conn->query("SELECT id, CONCAT(first_name, ' ', last_name) as name, phone, username as email FROM users WHERE type = 3");
+                                while ($row = $managers->fetch_assoc()):
                                 ?>
                                     <tr>
                                         <td class="text-center"><?php echo $i++ ?></td>
-                                        <td>
-                                            <?php echo ucwords($row['name']) ?>
-                                        </td>
-                                        <td class="">
-                                            <p> <b><?php echo $row['house_no'] ?></b></p>
-                                        </td>
-                                        <td class="">
-                                            <p> <b><?php echo number_format($row['price'], 2) ?></b></p>
-                                        </td>
-                                        <td class="text-right">
-                                            <p> <b><?php echo number_format($outstanding, 2) ?></b></p>
-                                        </td>
-                                        <td class="">
-                                            <p><b><?php echo  $last_payment ?></b></p>
-                                        </td>
+                                        <td><?php echo ucwords($row['name']) ?></td>
+                                        <td><?php echo $row['phone'] ?></td>
+                                        <td><?php echo $row['email'] ?></td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>">View</button>
-                                            <button class="btn btn-sm btn-primary edit_tenant" type="button" data-id="<?php echo $row['id'] ?>">Edit</button>
-                                            <button class="btn btn-sm btn-danger delete_tenant" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
+                                            <button class="btn btn-sm btn-outline-info edit_manager" data-id="<?php echo $row['id'] ?>"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger delete_manager" data-id="<?php echo $row['id'] ?>"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -77,65 +47,248 @@
                     </div>
                 </div>
             </div>
-            <!-- Table Panel -->
         </div>
     </div>
 
+    <!-- Manager Modal -->
+    <div class="modal fade" id="tModal" tabindex="-1" aria-labelledby="managerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="managerForm" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="managerModalLabel">Add New manager</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="newmanagerForm">
+                                    <!-- Personal Information Card -->
+
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label for="manager_fname" class="font-weight-bold">First Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="manager_fname" id="manager_fname" class="form-control" placeholder="Enter First Name" required>
+                                                <div class="invalid-feedback">Please provide first name</div>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="manager_lname" class="font-weight-bold">Last Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="manager_lname" id="manager_lname" class="form-control" placeholder="Enter Last Name" required>
+                                                <div class="invalid-feedback">Please provide last name</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label for="manager_phone" class="font-weight-bold">Phone Number <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-white"><i class="fas fa-phone text-primary"></i></span>
+                                                    </div>
+                                                    <input type="tel"
+                                                        name="manager_phone"
+                                                        id="manager_phone"
+                                                        class="form-control"
+                                                        placeholder="e.g. 0712345678"
+                                                        inputmode="numeric"
+                                                        maxlength="10"
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" 
+                                                        required>
+                                                    <div class="invalid-feedback">Valid phone number required</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-6">
+                                                <label for="gender" class="font-weight-bold">Gender<span class="text-danger">*</span></label>
+                                                <select name="gender" id="gender" class="form-control">
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Account Information Card -->
+
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <div class="form-group">
+                                                    <label for="manager_email" class="font-weight-bold">Email Address <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-white"><i class="fas fa-envelope text-primary"></i></span>
+                                                        </div>
+                                                        <input type="email" name="manager_email" id="manager_email" class="form-control" placeholder="e.g. manager@example.com" required>
+                                                        <div class="invalid-feedback">Valid email address required</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            
+                                        </div>
+
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle mr-2"></i> A default password <strong>rental</strong> will be created for the manager.
+                                        </div>
+
+                                        <!-- Profile Picture -->
+                                        <div class="row align-items-center">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" name="avatar" id="avatar" class="custom-file-input" accept="image/png, image/jpeg, image/jpg">
+                                                        <label class="custom-file-label" for="avatar">Choose profile image</label>
+                                                        <small class="form-text text-muted">Max size: 5MB (JPG, PNG)</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 text-center">
+                                                <div class="avatar-preview-container  ">
+                                                    <img id="avatarPreview" src="#" alt="Preview" class="d-none" style="width:120px;height:120px;object-fit:cover;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                <i class="fas fa-times mr-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-1"></i> Save manager
+                            </button>
+                        </div>
+                    </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-<style>
-    td {
-        vertical-align: middle !important;
-    }
-
-    td p {
-        margin: unset
-    }
-
-    img {
-        max-width: 100px;
-        max-height: 150px;
-    }
-</style>
 <script>
-    $(document).ready(function() {
-        $('table').dataTable()
-    })
+        document.addEventListener('DOMContentLoaded', function() {
+            // Avatar preview functionality
+            const avatarInput = document.getElementById('avatar');
+            const avatarPreview = document.getElementById('avatarPreview');
+            const fileLabel = document.querySelector('.custom-file-label');
 
-    $('#new_tenant').click(function() {
-        uni_modal("New Tenant", "manage_tenant.php", "mid-large")
+            if (avatarInput) {
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
 
-    })
+                    if (file) {
+                        // Check file size (5MB limit)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size exceeds 5MB limit');
+                            this.value = '';
+                            return;
+                        }
 
-    $('.view_payment').click(function() {
-        uni_modal("Tenants Payments", "view_payment.php?id=" + $(this).attr('data-id'), "large")
-
-    })
-    $('.edit_tenant').click(function() {
-        uni_modal("Manage Tenant Details", "manage_tenant.php?id=" + $(this).attr('data-id'), "mid-large")
-
-    })
-    $('.delete_tenant').click(function() {
-        _conf("Are you sure to delete this Tenant?", "delete_tenant", [$(this).attr('data-id')])
-    })
-
-    function delete_tenant($id) {
-        start_load()
-        $.ajax({
-            url: 'ajax.php?action=delete_tenant',
-            method: 'POST',
-            data: {
-                id: $id
-            },
-            success: function(resp) {
-                if (resp == 1) {
-                    alert_toast("Data successfully deleted", 'success')
-                    setTimeout(function() {
-                        location.reload()
-                    }, 1500)
-
-                }
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            avatarPreview.src = e.target.result;
+                            avatarPreview.classList.remove('d-none');
+                            fileLabel.textContent = file.name;
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        avatarPreview.src = '#';
+                        avatarPreview.classList.add('d-none');
+                        fileLabel.textContent = 'Choose profile image';
+                    }
+                });
             }
-        })
-    }
-</script>
+
+            // Form validation and submission
+            const managerForm = document.getElementById('managerForm');
+
+            if (managerForm) {
+                managerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Reset validation states
+                    const requiredInputs = this.querySelectorAll('[required]');
+                    let isValid = true;
+
+                    requiredInputs.forEach(input => {
+                        input.classList.remove('is-invalid');
+
+                        if (!input.value.trim()) {
+                            input.classList.add('is-invalid');
+                            isValid = false;
+                        } else {
+                            // Special validation for email
+                            if (input.id === 'manager_email' && !isValidEmail(input.value)) {
+                                input.classList.add('is-invalid');
+                                const feedback = input.nextElementSibling ||
+                                    input.parentElement.nextElementSibling;
+                                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                    feedback.textContent = 'Please enter a valid email address';
+                                }
+                                isValid = false;
+                            }
+
+                            // Special validation for phone
+                            if (input.id === 'manager_phone' && !isValidPhone(input.value)) {
+                                input.classList.add('is-invalid');
+                                const feedback = input.nextElementSibling ||
+                                    input.parentElement.nextElementSibling;
+                                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                    feedback.textContent = 'Please enter a valid phone number';
+                                }
+                                isValid = false;
+                            }
+                        }
+                    });
+
+                    if (isValid) {
+                        // Submit form via Fetch API
+                        const formData = new FormData(this);
+
+                        fetch('ajax.php?action=create_manager', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.text();
+                            })
+                            .then(text => {
+                                try {
+                                    const data = JSON.parse(text);
+                                    if (data.status === 'success') {
+                                        alert(data.msg);
+                                        location.reload();
+                                    } else {
+                                        throw new Error(data.msg || 'Operation failed');
+                                    }
+                                } catch {
+                                    // If response isn't JSON, show raw response
+                                    alert(text || 'manager created successfully');
+                                    location.reload();
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error: ' + error.message);
+                            });
+                    }
+                });
+            }
+
+            // Helper functions
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            function isValidPhone(phone) {
+                return /^[0-9]{10,15}$/.test(phone);
+            }
+        });
+    </script>

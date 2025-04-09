@@ -51,5 +51,138 @@ class Action
         }
     }
     
-}
+
+    public function create_manager()
+    {
+        // Verify session
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['login_id'])) {
+            return json_encode(['status' => 'error', 'msg' => 'Session expired. Please login again.']);
+        }
+
+        // Verify owner session
+        if (!isset($_SESSION['login_id']) || $_SESSION['login_type'] != 2) {
+            return json_encode(['status' => 'error', 'msg' => 'Unauthorized access']);
+        }
+
+        // Validate required fields
+        $required = ['manager_fname', 'manager_lname', 'manager_phone', 'manager_email'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                return json_encode(['status' => 'error', 'msg' => "Please fill all required fields"]);
+            }
+        }
+
+        // Sanitize inputs
+        $first_name = $this->sanitize($_POST['manager_fname']);
+        $last_name = $this->sanitize($_POST['manager_lname']);
+        $phone = $this->sanitize($_POST['manager_phone']);
+        $email = $this->sanitize($_POST['manager_email']);
+        $gender = $this->sanitize($_POST['gender'] ?? 'male');
+        $manager_id = $_SESSION['login_id'];
+        $password = password_hash('rental', PASSWORD_DEFAULT); // Default password
+
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return json_encode(['status' => 'error', 'msg' => 'Invalid email format']);
+        }
+
+        // Check if email exists
+        if ($this->email_exists($email)) {
+            return json_encode(['status' => 'error', 'msg' => 'Email already in use']);
+        }
+
+        // Handle file upload
+        $avatar_path = null;
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == UPLOAD_ERR_OK) {
+            $upload = $this->upload_avatar($_FILES['avatar']);
+            if ($upload['status'] == 'error') {
+                return json_encode(['status' => 'error', 'msg' => $upload['msg']]);
+            }
+            $avatar_path = $upload['path'];
+        }
+
+        // Create tenant account
+        try {
+            $this->db->begin_transaction();
+            $name = $first_name . ' ' . $last_name;
+
+            // Insert user
+            $stmt = $this->db->prepare("INSERT INTO users
+                (name,first_name, last_name, username, password, phone, gender, type, avatar) 
+                VALUES (?,?, ?, ?, ?, ?, ?, 3, ?)");
+            $stmt->bind_param("ssssssss",$name,$first_name, $last_name, $email, $password, $phone, $gender, $avatar_path);
+
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to create manager account');
+            }
+
+            $manager_id = $stmt->insert_id;
+            $stmt->close();
+
+            $this->db->commit();            
+
+            return json_encode([
+                'status' => 'success',
+                'msg' => 'manager created successfully',
+                'manager_id' => $manager_id
+            ]);
+        } catch (Exception $e) {
+            $this->db->rollback();
+            return json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
+    }
+
+    private function sanitize($input)
+    {
+        return $this->db->real_escape_string(htmlspecialchars(strip_tags(trim($input))));
+    }
+
+     // Check if email exists
+     private function email_exists($email)
+     {
+         $stmt = $this->db->prepare("SELECT id FROM users WHERE username = ?");
+         $stmt->bind_param("s", $email);
+         $stmt->execute();
+         $stmt->store_result();
+         $exists = $stmt->num_rows > 0;
+         $stmt->close();
+         return $exists;
+     }
+ 
+     // Handle avatar upload
+     private function upload_avatar($file)
+     {
+         $uploadDir = 'uploads/avatars/';
+         if (!file_exists($uploadDir)) {
+             mkdir($uploadDir, 0777, true);
+         }
+ 
+         $allowedTypes = ['image/jpeg', 'image/png'];
+         $maxSize = 5 * 1024 * 1024; // 5MB
+ 
+         if (!in_array($file['type'], $allowedTypes)) {
+             return ['status' => 'error', 'msg' => 'Only JPG and PNG files are allowed'];
+         }
+ 
+         if ($file['size'] > $maxSize) {
+             return ['status' => 'error', 'msg' => 'File size exceeds 5MB limit'];
+         }
+ 
+         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+         $filename = 'tenant_' . time() . '.' . $extension;
+         $destination = $uploadDir . $filename;
+ 
+         if (move_uploaded_file($file['tmp_name'], $destination)) {
+             return ['status' => 'success', 'path' => $destination];
+         }
+ 
+         return ['status' => 'error', 'msg' => 'Failed to upload file'];
+     }
+ 
+    
+}    
 ?>
