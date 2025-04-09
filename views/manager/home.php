@@ -67,9 +67,9 @@
                                             <div class="col-9 align-self-center text-right">
                                                 <div class="m-l-10">
                                                     <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM houses")->num_rows ?>
+                                                        <?php echo $conn->query("SELECT * FROM apartments where manager_id = {$_SESSION['login_id']}")->num_rows ?>
                                                     </h3>
-                                                    <p>Total Houses</p>
+                                                    <p>Total Apartments</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -91,9 +91,9 @@
                                             <div class="col-9 align-self-center text-right">
                                                 <div class="m-l-10">
                                                     <h3 class="text1">
-                                                        <?php echo $conn->query("SELECT * FROM tenants where status = 1 ")->num_rows ?>
+                                                        <?php echo $conn->query("SELECT * FROM users where type = 4 ")->num_rows ?>
                                                     </h3>
-                                                    <p>Total Tenants</p>
+                                                    <p>Total system Tenants</p>
                                                 </div>
                                             </div>
                                         </div>

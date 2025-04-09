@@ -266,6 +266,7 @@ class Action
         $tenant_id = $_POST['tenant_id'] ?? '';
         $amount = $_POST['amount'] ?? '';
         $payment_date = $_POST['payment_date'] ?? '';
+        $payment_method = $_POST['payment_method'] ?? '';
         $from_date = $_POST['from_date'] ?? '';
         $to_date = $_POST['to_date'] ?? '';
 
@@ -310,6 +311,7 @@ class Action
             'tenant_id' => $this->db->real_escape_string($tenant_id),
             'amount' => floatval($amount),
             'payment_date' => $payment_date_obj->format('Y-m-d'),
+            'payment_method' => $payment_method,
             'from_date' => $from_date_obj->format('Y-m-d'),
             'to_date' => $to_date_obj->format('Y-m-d'),
             'created_by' => $_SESSION['login_id'],

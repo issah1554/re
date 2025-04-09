@@ -1570,6 +1570,7 @@ section {
 nav#sidebar {
     height: calc(100%);
     position: fixed;
+    margin-top: 0;
     z-index: 99;
     left: 0;
     width: 250px;
@@ -1611,7 +1612,7 @@ a.nav-item:focus,.nav-item.active {
 main#view-panel{
   margin-left: 250px; 
   width:calc(100% - 250px);
-  margin-top: 100px;
+  margin-top: 68px;
   padding: .5em
 }
 .toast{
