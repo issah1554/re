@@ -1,4 +1,4 @@
-  <nav class="navbar navbar-light bg-light" style="padding:0;min-height: 3.5rem;margin-left:250px;">
+  <nav class="navbar navbar-light bg-white border-bottom" style="padding:0;min-height: 3.5rem;margin-left:250px;">
 
      <div class="container-fluid mt-2 mb-2">
         <div class="row d-flex justify-content-end align-items-center">
