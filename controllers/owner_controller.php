@@ -1,4 +1,5 @@
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -21,35 +22,45 @@ class Action
         ob_end_flush();
     }
     public function add_apartment() {
-        // Make sure the user is logged in
         if (!isset($_SESSION['login_id'])) {
             return json_encode(['status' => 'error', 'message' => 'User not authenticated']);
         }
     
         $owner_id = $_SESSION['login_id'];
     
-        // Sanitize input
+        $id = isset($_POST['id']) && $_POST['id'] !== '' ? intval($_POST['id']) : 0;
         $number = $this->db->real_escape_string($_POST['number']);
         $description = $this->db->real_escape_string($_POST['description']);
         $price = floatval($_POST['price']);
         $category_id = intval($_POST['category_id']);
     
-        // Check if apartment number already exists for this owner
-        $check = $this->db->query("SELECT * FROM apartments WHERE number = '$number' AND owner_id = $owner_id");
-        if ($check && $check->num_rows > 0) {
-            return json_encode(['status' => 'error', 'message' => 'Apartment number already exists for this owner.']);
-        }
-    
-        // Insert into database
-        $stmt = $this->db->prepare("INSERT INTO apartments (number, description, price, category_id, owner_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdii", $number, $description, $price, $category_id, $owner_id);
-    
-        if ($stmt->execute()) {
-            return json_encode(['status' => 'success', 'message' => 'Apartment successfully added.']);
+        if ($id > 0) {
+            // Update existing apartment
+            $stmt = $this->db->prepare("UPDATE apartments SET number = ?, description = ?, price = ?, category_id = ? WHERE id = ? AND owner_id = ?");
+            $stmt->bind_param("ssdiii", $number, $description, $price, $category_id, $id, $owner_id);
+            if ($stmt->execute()) {
+                return json_encode(['status' => 'success', 'message' => 'Apartment successfully updated.']);
+            } else {
+                return json_encode(['status' => 'error', 'message' => 'Update failed: ' . $this->db->error]);
+            }
         } else {
-            return json_encode(['status' => 'error', 'message' => 'Database error: ' . $this->db->error]);
+            // Check for duplicate number
+            $check = $this->db->query("SELECT * FROM apartments WHERE number = '$number' AND owner_id = $owner_id");
+            if ($check && $check->num_rows > 0) {
+                return json_encode(['status' => 'error', 'message' => 'Apartment number already exists for this owner.']);
+            }
+    
+            // Insert new apartment
+            $stmt = $this->db->prepare("INSERT INTO apartments (number, description, price, category_id, owner_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdii", $number, $description, $price, $category_id, $owner_id);
+            if ($stmt->execute()) {
+                return json_encode(['status' => 'success', 'message' => 'Apartment successfully added.']);
+            } else {
+                return json_encode(['status' => 'error', 'message' => 'Insert failed: ' . $this->db->error]);
+            }
         }
     }
+    
     
 
     public function create_manager()
@@ -247,6 +258,63 @@ class Action
             return json_encode(['status' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
-    
+   // Get Manager Details
+    public function get_manager_details($managerId) {
+        // Include database connection if it's not already included
+        include 'db_connect.php';
+        
+        // Fetch manager details based on manager ID
+        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->bind_param("i", $managerId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $manager = $result->fetch_assoc();
+            
+            // Fetch apartments assigned to this manager
+            $stmt_apartments = $conn->prepare("SELECT * FROM apartments WHERE manager_id = ?");
+            $stmt_apartments->bind_param("i", $managerId);
+            $stmt_apartments->execute();
+            $apartments_result = $stmt_apartments->get_result();
+
+            $apartments = [];
+            while ($apartment = $apartments_result->fetch_assoc()) {
+                $apartments[] = $apartment;
+            }
+
+            // Return the manager and apartments data
+            return json_encode([
+                'status' => 'success',
+                'data' => [
+                    'manager' => $manager,
+                    'apartments' => $apartments
+                ]
+            ]);
+        } else {
+            return json_encode(['status' => 'error', 'msg' => 'Manager not found']);
+        }
+    }
+
+        // Remove Apartment from Manager
+    public function remove_apartment($apartmentId, $managerId) {
+        // Include database connection if it's not already included
+        include 'db_connect.php';
+
+        // Prepare query to remove the manager from the apartment
+        $stmt = $conn->prepare("UPDATE apartments SET manager_id = NULL WHERE id = ? AND manager_id = ?");
+        $stmt->bind_param("ii", $apartmentId, $managerId);
+
+        // Execute query and check if the operation was successful
+        if ($stmt->execute()) {
+            return json_encode(['status' => 'success', 'message' => 'Apartment removed successfully']);
+        } else {
+            return json_encode(['status' => 'error', 'message' => 'Failed to remove apartment']);
+        }
+    }
+
+
 }
-?>
+
+
+  ?>

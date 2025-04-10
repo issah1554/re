@@ -156,6 +156,58 @@
         </div>
     </div>
 </div>
+
+<!-- Manager Details Modal -->
+<div class="modal fade" id="managerDetailsModal" tabindex="-1" aria-labelledby="managerDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="managerDetailsLabel">Manager Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="managerDetailsContent">
+                    <!-- Manager Details will be inserted here dynamically -->
+                    <div class="form-group">
+                        <label><strong>Name:</strong></label>
+                        <p id="managerName"></p>
+                    </div>
+                    <div class="form-group">
+                        <label><strong>Email:</strong></label>
+                        <p id="managerEmail"></p>
+                    </div>
+                    <div class="form-group">
+                        <label><strong>Phone:</strong></label>
+                        <p id="managerPhone"></p>
+                    </div>
+                    <hr>
+                    <h5>Assigned Apartments</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Apartment No.</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apartmentsTableBody">
+                            <!-- Apartments will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Avatar preview functionality
@@ -304,6 +356,7 @@
                                             '<td class="text-center">' +
                                                 '<button class="btn btn-sm btn-outline-info edit_manager" data-id="' + manager.id + '"><i class="fas fa-edit"></i></button>' +
                                                 '<button class="btn btn-sm btn-outline-danger delete_manager" data-id="' + manager.id + '"><i class="fas fa-trash"></i></button>' +
+                                                '<button class="btn btn-sm btn-outline-success view_manager_details" data-id="' + manager.id + '"><i class="fas fa-eye"></i> View Details</button>'
                                             '</td>' +
                                         '</tr>';
                                 tableBody.append(row);
@@ -319,5 +372,94 @@
             // Load managers when the page is ready
             loadManagers();
         });
+
+
+        $(document).ready(function() {
+    // View manager details
+            $(document).on('click', '.view_manager_details', function() {
+                const managerId = $(this).data('id');
+                
+                // Fetch manager details via AJAX
+                $.ajax({
+                    url: 'ajax.php',
+                    method: 'GET',
+                    data: { action: 'get_manager_details', manager_id: managerId },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status !== 'error') {
+                            const manager = response.data.manager;
+                            const apartments = response.data.apartments;
+                            
+                            // Populate manager details
+                            $('#managerName').text(manager.first_name + ' ' + manager.last_name);
+                            $('#managerEmail').text(manager.email);
+                            $('#managerPhone').text(manager.phone);
+
+                            // Populate apartments table
+                            const apartmentsTableBody = $('#apartmentsTableBody');
+                            apartmentsTableBody.empty();
+                            if (apartments.length > 0) {
+                                apartments.forEach(function(apartment, index) {
+                                    const row = '<tr>' +
+                                                    '<td>' + (index + 1) + '</td>' +
+                                                    '<td>' + apartment.number + '</td>' +
+                                                    '<td>' + apartment.price + '</td>' +
+                                                    '<td><button class="btn btn-sm btn-outline-danger remove_apartment" data-apartment-id="' + apartment.id + '" data-manager-id="' + managerId + '"><i class="fas fa-trash"></i> Remove</button></td>' +
+
+                                                '</tr>';
+                                    apartmentsTableBody.append(row);
+                                });
+                            } else {
+                                apartmentsTableBody.append('<tr><td colspan="3">No apartments assigned.</td></tr>');
+                            }
+
+                            // Show the modal
+                            $('#managerDetailsModal').modal('show');
+                        } else {
+                            alert('Error fetching manager details');
+                        }
+                    },
+                    error: function() {
+                        alert('Error loading manager details');
+                    }
+                });
+            });
+        });
+        $(document).ready(function() {
+            // Handle the click on the "Remove" button for apartment
+            $(document).on('click', '.remove_apartment', function() {
+                const apartmentId = $(this).data('apartment-id');
+                const managerId = $(this).data('manager-id');
+                
+                // Ask for confirmation before removing the apartment
+                if (confirm('Are you sure you want to remove this apartment from the manager?')) {
+                    // Send an AJAX request to remove the apartment
+                    $.ajax({
+                        url: 'ajax.php',
+                        method: 'POST',
+                        data: {
+                            action: 'remove_apartment',
+                            apartment_id: apartmentId,
+                            manager_id: managerId
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                // If successful, remove the apartment row from the table
+                                alert('Apartment removed successfully!');
+                                // Remove the row from the table (this can be done dynamically)
+                                $('[data-apartment-id="' + apartmentId + '"]').closest('tr').remove();
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function() {
+                            alert('Error removing apartment');
+                        }
+                    });
+                }
+            });
+        });
+
 
     </script>

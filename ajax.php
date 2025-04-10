@@ -193,6 +193,22 @@ if ($_SESSION['login_type'] == 2) {  // Ensure the user is an owner (login type 
 	}
 	
 	
+	if (isset($_GET['action']) && $_GET['action'] == 'get_manager_details') {
+		$managerId = $_GET['manager_id'];
+		$response = $crud->get_manager_details($managerId);
+		echo $response;
+	}
+	
+	if (isset($_POST['action']) && $_POST['action'] == 'remove_apartment') {
+		$apartmentId = $_POST['apartment_id'];
+		$managerId = $_POST['manager_id'];
+		$response = $crud->remove_apartment($apartmentId, $managerId);
+		echo $response;
+	}
+	
+	
+	
+	
 
 
 }
