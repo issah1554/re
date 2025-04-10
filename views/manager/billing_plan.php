@@ -174,6 +174,16 @@
                             </div>
 
                             <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="contractFile" class="form-label">Upload Contract Document <span class="text-danger"> (PDF)</span></label>
+                                        <div class="custom-file">
+                                            <input type="file" name="contract_file" id="contractFile" class="custom-file-input" accept="image/png, image/jpeg, image/jpg">
+                                            <label class="custom-file-label" for="avatar">Choose a document</label>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6 d-flex align-items-center">
                                     <div class="form-check mt-3">
                                         <input type="checkbox" class="form-check-input" id="hasFamily">
@@ -196,21 +206,17 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label for="witnessPhone" class="form-label">Witness Phone</label>
-                                    <input type="tel" class="form-control" id="witnessPhone" placeholder="e.g., 123-456-7890">
+                                    <input 
+                                    type="tel" 
+                                    class="form-control" 
+                                    id="witnessPhone" 
+                                    placeholder="e.g., 0722334455"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
                                 </div>
 
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="contractFile" class="form-label">Upload Contract Document <span class="text-danger"> (PDF)</span></label>
-                                        <div class="custom-file">
-                                            <input type="file" name="contract_file" id="contractFile" class="custom-file-input" accept="image/png, image/jpeg, image/jpg">
-                                            <label class="custom-file-label" for="avatar">Choose a document</label>
-                                        </div>
-                                    </div>
-                                </div>
 
                             </div>
                         </form>
@@ -228,12 +234,7 @@
 
         <!-- JavaScript to handle the modal -->
         <script>
-            // This would be triggered by the "New Contract" button in your main interface
             document.addEventListener('DOMContentLoaded', function() {
-                // Example of how to show the modal (you would trigger this from your "New Contract" button)
-                // var newContractModal = new bootstrap.Modal(document.getElementById('newContractModal'));
-                // newContractModal.show();
-
                 // Form submission handling
                 document.getElementById('saveContractBtn').addEventListener('click', function() {
                     const form = document.getElementById('contractForm');

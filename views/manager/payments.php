@@ -321,9 +321,13 @@
                                                 <option value="" selected disabled>-- Select Tenant --</option>
                                                 <?php
                                                 $tenants = $conn->query("
-                                                    SELECT u.id, CONCAT(u.first_name,' ',u.last_name) as name, a.number 
-                                                    FROM users u 
-                                                    INNER JOIN apartments a ON a.tenant_id = u.id 
+                                                    SELECT 
+                                                    u.id, 
+                                                    CONCAT(u.first_name,' ',u.last_name) as name, 
+                                                    a.number 
+                                                    FROM users AS u 
+                                                    LEFT JOIN contracts AS c ON c.tenant_id = u.id
+                                                    LEFT JOIN apartments AS a ON a.id = c.apartment_id 
                                                     WHERE u.type = 4 AND a.manager_id = '{$_SESSION['login_id']}'
                                                 ");
                                                 while ($row = $tenants->fetch_assoc()):
@@ -379,18 +383,6 @@
                                         <div class="form-group">
                                             <label for="payment_date" class="control-label">Payment Date</label>
                                             <input type="date" class="form-control" name="payment_date" id="payment_date" value="<?php echo date('Y-m-d') ?>" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="from_date" class="control-label">From Date</label>
-                                            <input type="date" class="form-control" name="from_date" id="from_date" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="to_date" class="control-label">To Date</label>
-                                            <input type="date" class="form-control" name="to_date" id="to_date" required>
                                         </div>
                                     </div>
                                 </div>

@@ -146,7 +146,7 @@
                                                         placeholder="e.g. 0712345678"
                                                         inputmode="numeric"
                                                         maxlength="10"
-                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" 
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
                                                         required>
                                                     <div class="invalid-feedback">Valid phone number required</div>
                                                 </div>
@@ -176,31 +176,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div class="form-group col-md-6">
-                                                <label for="gender" class="font-weight-bold">Apartment <span class="text-danger">*</span></label>
-                                                <select name="apartment_id" id="apartment_id" class="form-control">
-                                                    <option value="" selected disabled>-- Select Apartment --</option>
-                                                    <?php
-                                                    $apartments = $conn->query("SELECT id, number FROM apartments WHERE manager_id = '{$_SESSION['login_id']}' AND tenant_id IS NULL");
-                                                    while ($row = $apartments->fetch_assoc()):
-                                                    ?>
-                                                        <option value="<?php echo $row['id'] ?>"><?php echo $row['number'] ?></option>
-                                                    <?php endwhile; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="alert alert-info">
-                                            <i class="fas fa-info-circle mr-2"></i> A default password <strong>rental</strong> will be created for the tenant.
-                                        </div>
-
-                                        <!-- Profile Picture -->
-                                        <div class="row align-items-center">
                                             <div class="col-md-6">
                                                 <div class="form-group">
+                                                    <label for="avatar" class="font-weight-bold">Tenat Image<span class="text-danger">*</span></label>
                                                     <div class="custom-file">
-                                                        <input type="file" name="avatar" id="avatar" class="custom-file-input" accept="image/png, image/jpeg, image/jpg">
+                                                        <input type="file" name="avatar" id="avatar" class="custom-file-input" accept="image/png, image/jpeg, image/jpg" required>
                                                         <label class="custom-file-label" for="avatar">Choose profile image</label>
                                                         <small class="form-text text-muted">Max size: 5MB (JPG, PNG)</small>
                                                     </div>
@@ -211,6 +191,16 @@
                                                     <img id="avatarPreview" src="#" alt="Preview" class="d-none" style="width:120px;height:120px;object-fit:cover;">
                                                 </div>
                                             </div>
+
+
+                                        </div>
+
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle mr-2"></i> A default password <strong>rental</strong> will be created for the tenant.
+                                        </div>
+
+                                        <!-- Profile Picture -->
+                                        <div class="row align-items-center">
                                         </div>
                                     </div>
                                 </div>

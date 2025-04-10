@@ -1,13 +1,31 @@
+<link rel="stylesheet" type="text/css" href="assets/css/matarial.css">
 <style>
-    .collapse a {
-        text-indent: 10px;
+    #sidebar {
+        width: 250px;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        background-color:white;
+    }
+
+    .brand-link {
+        font-size: 1rem;
+        font-weight: bold;
+        display: block;
+        color: #a889d9;
+        border-bottom: 1px solid rgb(234, 234, 234);
+        text-align: center;
+        background-color: white;
+        min-height: 69px;
+        padding: 1.2rem;
     }
 </style>
-<link rel="stylesheet" type="text/css" href="assets/css/matarial.css">
-<nav id="sidebar" class='mx-lt-5 bg-white'>
 
+<nav id="sidebar">
+    <a href="#" class="brand-link">Rental Management</a>
     <div class="sidebar-list">
-        <div id="sidebar-menu" class="sidebar-inner">
+        <div id="sidebar-menu">
             <?php if ($_SESSION['login_type'] == 1): ?>
                 <ul class="p-0">
                     <a href="index.php?page=<?php echo base64_encode('home'); ?>" class="nav-item nav-home">
@@ -174,8 +192,6 @@
                 </ul>
 
             <?php endif; ?>
-
-
         </div>
     </div>
 
