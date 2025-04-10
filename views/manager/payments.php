@@ -29,7 +29,7 @@
                                         <th class="text-center" data-sort="index">#</th>
                                         <th data-sort="tenant">Tenant</th>
                                         <th data-sort="house">House #</th>
-                                        <th data-sort="period">Period</th>
+                                        <th data-sort="period">Contract</th>
                                         <th data-sort="payment_date">Payment Date</th>
                                         <th data-sort="method">Method</th>
                                         <th data-sort="status">Status</th>
@@ -42,25 +42,26 @@
                                     $i = 1;
                                     $payments = $conn->query("
                                         SELECT 
-                                        CONCAT(tenant.first_name, ' ', tenant.last_name) as name,
-                                        apt.number AS apartment_no,
-                                        p.amount,
-                                        p.from_date as from_date,
-                                        p.to_date as to_date,
-                                        p.id,
-                                        p.payment_date,
-                                        p.payment_method,
-                                        p.status,
-                                        p.verified_by,
-                                        p.invoice
-                                        FROM users as tenant
-                                        INNER JOIN payments as p ON tenant.id = p.tenant_id
-                                        INNER JOIN apartments as apt ON apt.tenant_id = tenant.id
+                                            CONCAT(tenant.first_name, ' ', tenant.last_name) AS name,
+                                            apt.number AS apartment_no,
+                                            p.amount,
+                                            p.id,
+                                            p.payment_date,
+                                            p.payment_method,
+                                            p.status,
+                                            p.verified_by,
+                                            p.invoice,
+                                            contract.from_date,
+                                            contract.id AS contract_id
+                                        FROM users AS tenant
+                                        INNER JOIN payments AS p ON tenant.id = p.tenant_id
+                                        INNER JOIN contracts AS contract ON contract.id = p.contract_id
+                                        INNER JOIN apartments AS apt ON apt.id = contract.apartment_id
                                         WHERE tenant.type = 4 AND apt.manager_id = '{$_SESSION['login_id']}'
-                                        ORDER BY p.id DESC
+                                        ORDER BY p.id DESC;
                                     ");
                                     while ($row = $payments->fetch_assoc()):
-                                        $period = date('M d, Y', strtotime($row['from_date'])) . ' - ' . date('M d, Y', strtotime($row['to_date']));
+                                        $contract_code = 'CT-' . $row['contract_id'] . '-' . date('Ym', strtotime($row['from_date']));
                                         $paymentDate = $row['payment_date'] ? date('M d, Y', strtotime($row['payment_date'])) : 'N/A';
                                     ?>
                                         <tr>
@@ -77,7 +78,7 @@
                                                 <span class="badge badge-light"><?php echo $row['apartment_no'] ?></span>
                                             </td>
                                             <td>
-                                                <small><?php echo $period ?></small>
+                                                <small><?php echo $contract_code ?></small>
                                             </td>
                                             <td>
                                                 <small><?php echo $paymentDate ?></small>

@@ -36,7 +36,7 @@
                                 <?php
                                 $i = 1;
                                 $tenant = $conn->query("
-                                    SELECT 
+                                    SELECT DISTINCT
                                         CONCAT(tenant.first_name, ' ', tenant.last_name) as tenant_name,
                                         tenant.id as id,
                                         tenant.phone as phone,
@@ -45,8 +45,9 @@
                                         apt.number as apartment_no,
                                         apt.price as price
                                     FROM users as tenant                                
-                                    INNER JOIN apartments as apt ON tenant.id = apt.tenant_id
-                                    WHERE apt.manager_id = '{$_SESSION['login_id']}'                                    
+                                    LEFT JOIN contracts as contr ON tenant.id = contr.tenant_id
+                                    LEFT JOIN apartments as apt ON apt.id = contr.apartment_id
+                                    WHERE tenant.type = 4 AND apt.manager_id = '{$_SESSION['login_id']}'                                    
                                 ");
                                 while ($row = $tenant->fetch_assoc()):
                                 ?>
@@ -154,9 +155,8 @@
                                             <div class="form-group col-md-6">
                                                 <label for="gender" class="font-weight-bold">Gender<span class="text-danger">*</span></label>
                                                 <select name="gender" id="gender" class="form-control">
-                                                    <option value="M">Male</option>
-                                                    <option value="F">Female</option>
-                                                    <option value="O">Other</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
                                                 </select>
                                             </div>
                                         </div>

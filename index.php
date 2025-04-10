@@ -114,6 +114,7 @@
       'views/manager/tenants',
       'views/manager/payments',
       'views/manager/apartments',
+      'views/manager/billing_plan',
 
       'views/tenant/home',
       'views/tenant/payments',

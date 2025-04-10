@@ -132,6 +132,10 @@
                         <span class='icon-field'><i data-feather="credit-card"></i></span> Payments
                     </a>
 
+                    <a href="index.php?page=<?php echo base64_encode('views/manager/billing_plan'); ?>" class="nav-item nav-invoices">
+                        <span class='icon-field'><i data-feather="file-text"></i></span> Contracts
+                    </a>
+
                     <!-- <li class="has_sub">
                         <a href="javascript:void(0);" class="nav-item nav-categories waves-effect">
                             <i data-feather="align-justify"></i>

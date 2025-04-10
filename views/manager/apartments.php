@@ -46,22 +46,24 @@
                                 <?php
                                 $i = 1;
                                 $apartment = $conn->query("
-                                    SELECT 
-                                        apartments.number as apartment_no,
-                                        apartments.description as description,
-                                        apartments.price as price,
-                                        apartments.owner_id as owner,
-                                        apartments.tenant_id as tenant,
-                                        categories.name as cname,
-                                        CONCAT(owner.first_name, ' ', owner.last_name) as owner_name,
-                                        CONCAT(tenant.first_name, ' ', tenant.last_name) as tenant_name,
-                                        categories.id as category_id,
-                                        apartments.id as id                                
-                                    FROM apartments
-                                    LEFT JOIN categories ON apartments.category_id = categories.id
-                                    INNER JOIN users as owner ON apartments.owner_id = owner.id 
-                                    LEFT JOIN users as tenant ON apartments.tenant_id = tenant.id                                   
-                                    WHERE apartments.manager_id = {$_SESSION['login_id']}
+                                        SELECT DISTINCT
+                                            apartments.number AS apartment_no,
+                                            apartments.description AS description,
+                                            apartments.price AS price,
+                                            apartments.owner_id AS owner,
+                                            apartments.id AS id,
+                                            CONCAT(owner.first_name, ' ', owner.last_name) AS owner_name,
+                                            CONCAT(tenant.first_name, ' ', tenant.last_name) AS tenant_name,
+                                            categories.id AS category_id,
+                                            categories.name AS cname,
+                                            contract.tenant_id AS tenant
+                                        FROM apartments
+                                        LEFT JOIN categories ON apartments.category_id = categories.id
+                                        INNER JOIN users AS owner ON apartments.owner_id = owner.id 
+                                        LEFT JOIN contracts AS contract ON apartments.id = contract.apartment_id
+                                        LEFT JOIN users AS tenant ON  tenant.id = contract.tenant_id 
+                                        WHERE apartments.manager_id = {$_SESSION['login_id']}
+
                                     ");
                                 while ($row = $apartment->fetch_assoc()):
                                 ?>
