@@ -297,9 +297,6 @@
                 }
             </style>
 
-            <script>
-            </script>
-
             <!-- Payment Modal -->
             <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">

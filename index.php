@@ -81,13 +81,13 @@
   <main id="view-panel">
     <?php
     // Default page if none specified
-    if($_SESSION['login_type'] == 1){
+    if ($_SESSION['login_type'] == 1) {
       $default_page = 'home';
-    }else if($_SESSION['login_type'] == 2){
+    } else if ($_SESSION['login_type'] == 2) {
       $default_page = 'views/owner/home';
-    }else if($_SESSION['login_type'] == 3){
+    } else if ($_SESSION['login_type'] == 3) {
       $default_page = 'views/manager/home';
-    }else if($_SESSION['login_type'] == 4){
+    } else if ($_SESSION['login_type'] == 4) {
       $default_page = 'views/tenant/home';
     }
 
@@ -180,6 +180,7 @@
   </div>
 
 </body>
+
 
 <script>
   window.start_load = function() {

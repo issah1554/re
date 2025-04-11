@@ -244,6 +244,11 @@ if ($_SESSION['login_type'] == 3) {
 		if ($save)
 			echo $save;
 	}
+	if ($action == 'save_contract') {
+		$save = $crud->save_contract();
+		if ($save)
+			echo $save;
+	}
 } 
 
 

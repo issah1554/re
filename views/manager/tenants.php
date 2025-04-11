@@ -47,7 +47,8 @@
                                     FROM users as tenant                                
                                     LEFT JOIN contracts as contr ON tenant.id = contr.tenant_id
                                     LEFT JOIN apartments as apt ON apt.id = contr.apartment_id
-                                    WHERE tenant.type = 4 AND apt.manager_id = '{$_SESSION['login_id']}'                                    
+                                    WHERE tenant.type = 4 AND (apt.manager_id = '{$_SESSION['login_id']}' OR created_by = '{$_SESSION['login_id']}')
+                                    ORDER BY id DESC
                                 ");
                                 while ($row = $tenant->fetch_assoc()):
                                 ?>
@@ -56,7 +57,7 @@
                                         <td class="align-middle">
                                             <div class="d-flex align-items-center">
                                                 <?php if (!empty($row['avatar'])): ?>
-                                                    <img src="<?php echo $row['avatar'] ?>" class="rounded-circle me-2" width="40" height="40" alt="Tenant Avatar">
+                                                    <img src="uploads/avatars/<?php echo $row['avatar'] ?>" class="rounded-circle me-2" width="40" height="40" alt="Tenant Avatar">
                                                 <?php else: ?>
                                                     <div class="avatar-placeholder rounded-circle bg-light text-center me-2" style="width:40px;height:40px;line-height:40px;">
                                                         <i class="fas fa-user text-muted"></i>
@@ -80,12 +81,6 @@
                                         <td class="text-center align-middle">
                                             <button class="btn btn-sm btn-outline-primary view_payment" type="button" data-id="<?php echo $row['id'] ?>">
                                                 <i class="fas fa-receipt"></i> Payments
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-info edit_tenant" type="button" data-id="<?php echo $row['id'] ?>">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger delete_tenant" type="button" data-id="<?php echo $row['id'] ?>">
-                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -315,14 +310,14 @@
                                     const data = JSON.parse(text);
                                     if (data.status === 'success') {
                                         alert(data.msg);
-                                        location.reload();
+                                        // location.reload();
                                     } else {
                                         throw new Error(data.msg || 'Operation failed');
                                     }
                                 } catch {
                                     // If response isn't JSON, show raw response
                                     alert(text || 'Tenant created successfully');
-                                    location.reload();
+                                    // location.reload();
                                 }
                             })
                             .catch(error => {
